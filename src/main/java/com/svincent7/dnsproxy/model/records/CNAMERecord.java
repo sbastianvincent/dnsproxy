@@ -28,7 +28,7 @@ import lombok.ToString;
  * 00                                                       ; End of name
  */
 @Getter
-@ToString
+@ToString(callSuper = true)
 public class CNAMERecord extends Record {
     private final Name singleName;
 

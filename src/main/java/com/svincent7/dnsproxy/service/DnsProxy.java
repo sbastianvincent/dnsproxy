@@ -4,6 +4,7 @@ import com.svincent7.dnsproxy.config.DnsProxyConfig;
 import com.svincent7.dnsproxy.service.cache.CacheFactory;
 import com.svincent7.dnsproxy.service.cache.CacheService;
 import com.svincent7.dnsproxy.service.dnsclient.DNSUDPClientFactory;
+import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProviderFactory;
 import com.svincent7.dnsproxy.service.packet.PacketHandler;
 import com.svincent7.dnsproxy.service.packet.UDPHandler;
 import jakarta.annotation.PostConstruct;
@@ -25,6 +26,7 @@ public class DnsProxy {
     private final ExecutorService executor;
     private final CacheService cacheService;
     private final DNSUDPClientFactory dnsudpClientFactory;
+    private final DNSRewritesProviderFactory dnsRewritesProviderFactory;
 
     private boolean running = false;
 
@@ -32,11 +34,13 @@ public class DnsProxy {
 
     @Autowired
     public DnsProxy(final DnsProxyConfig config, final CacheFactory cacheFactory,
-                    final DNSUDPClientFactory dnsudpClientFactory) throws Exception {
+                    final DNSUDPClientFactory dnsudpClientFactory,
+                    final DNSRewritesProviderFactory dnsRewritesProviderFactory) throws Exception {
         this.executor = Executors.newFixedThreadPool(config.getThreadPoolSize());
         this.socket = new DatagramSocket(config.getPort());
         this.cacheService = cacheFactory.getCacheService();
         this.dnsudpClientFactory = dnsudpClientFactory;
+        this.dnsRewritesProviderFactory = dnsRewritesProviderFactory;
     }
 
     @PostConstruct
@@ -53,8 +57,10 @@ public class DnsProxy {
                     socket.receive(request);
                     executor.submit(() -> {
                         try {
-                            PacketHandler handler = new UDPHandler(socket, request, cacheService,
-                                    dnsudpClientFactory.createDNSUDPClient());
+                            PacketHandler handler = new UDPHandler(
+                                    socket, request, cacheService,
+                                    dnsudpClientFactory.createDNSUDPClient(),
+                                    dnsRewritesProviderFactory.getDNSRewritesProvider());
                             handler.handlePacket();
                         } catch (Exception e) {
                             e.printStackTrace();

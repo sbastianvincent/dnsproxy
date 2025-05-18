@@ -39,7 +39,7 @@ import java.util.TreeMap;
  * 1f 90                                                    ; port 8080 (0x1f90)
  */
 @Getter
-@ToString
+@ToString(callSuper = true)
 public class HTTPSRecord extends Record {
     private final short svcPriority;
     private final Name targetName;

@@ -32,9 +32,9 @@ import lombok.extern.slf4j.Slf4j;
  * RDLENGTH         00 04                      4 bytes
  * RDATA            5d b8 d8 22                IP: 93.184.216.34
  */
-@ToString
 @Getter
 @Slf4j
+@ToString
 @NoArgsConstructor
 public abstract class Record implements Cloneable {
     protected Name name;

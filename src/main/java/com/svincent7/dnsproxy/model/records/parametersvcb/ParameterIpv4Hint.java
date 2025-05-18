@@ -12,7 +12,7 @@ import java.util.List;
 public class ParameterIpv4Hint implements ParameterSvcBinding {
     private final List<byte[]> addresses;
 
-    private static final int IPV4_ADDRESS_LENGTH = 4;
+    public static final int IPV4_ADDRESS_LENGTH = 4;
 
     public ParameterIpv4Hint() {
         super();

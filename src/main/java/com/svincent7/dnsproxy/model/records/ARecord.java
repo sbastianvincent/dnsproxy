@@ -25,7 +25,7 @@ import lombok.ToString;
  * 5d b8 d8 22                                              ; RDATA = 93.184.216.34
  */
 @Getter
-@ToString
+@ToString(callSuper = true)
 public class ARecord extends Record {
     private final int addr;
     private final String ipAddress;
@@ -50,6 +50,13 @@ public class ARecord extends Record {
         super(name, type, dnsClass, ttl, length);
         this.addr = fromArray(message.readByteArray(IPV4_LENGTH));
         ipAddress = getIpAddress(toArray(addr));
+    }
+
+    public ARecord(final Name name, final Type type, final DNSClass dnsClass, final long ttl, final int length,
+                   final String ipAddress) {
+        super(name, type, dnsClass, ttl, length);
+        this.ipAddress = ipAddress;
+        this.addr = ipToInt(ipAddress);
     }
 
     public ARecord(final ARecord record) {
@@ -82,6 +89,18 @@ public class ARecord extends Record {
     @Override
     public Record clone() {
         return new ARecord(this);
+    }
+
+    private int ipToInt(final String ip) {
+        String[] parts = ip.split("\\.");
+        if (parts.length != IPV4_LENGTH) {
+            throw new IllegalArgumentException("Invalid IPv4 address: " + ip);
+        }
+
+        return (Integer.parseInt(parts[IP_INDEX_0]) << SHIFT_24)
+                | (Integer.parseInt(parts[IP_INDEX_1]) << SHIFT_16)
+                | (Integer.parseInt(parts[IP_INDEX_2]) << SHIFT_8)
+                | Integer.parseInt(parts[IP_INDEX_3]);
     }
 
     private String getIpAddress(final byte[] bytes) {

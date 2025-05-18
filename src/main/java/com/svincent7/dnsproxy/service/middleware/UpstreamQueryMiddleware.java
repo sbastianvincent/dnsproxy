@@ -10,10 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UpstreamQueryMiddleware extends MessageMiddleware {
 
+    private final CacheService cacheService;
     private final DNSUDPClient client;
 
     public UpstreamQueryMiddleware(final CacheService cacheService, final DNSUDPClient client) {
-        super(cacheService);
+        this.cacheService = cacheService;
         this.client = client;
     }
 
@@ -26,7 +27,7 @@ public class UpstreamQueryMiddleware extends MessageMiddleware {
             byte[] response = client.send(request.getData());
             log.info("response: {}", response);
             Message responseMessage = new Message(new MessageInput(response));
-            getCacheService().cacheResponse(responseMessage);
+            cacheService.cacheResponse(responseMessage);
             return handleNext(responseMessage);
         } catch (Exception e) {
             e.printStackTrace();

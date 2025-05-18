@@ -28,6 +28,7 @@ public class Header {
     private static final int UNSIGNED_SHORT_MASK = 0xFFFF;
     private static final int OPCODE_MASK = 0xF;
     private static final int OPCODE_SHIFT = 11;
+    private static final int RCODE_MASK = 0x000F;
 
     public Header(final MessageInput messageInput) {
         this.transactionId = messageInput.readU16();
@@ -46,6 +47,10 @@ public class Header {
 
     public OpCode getOpCode() {
         return OpCode.fromValue((((flags & UNSIGNED_SHORT_MASK) >> OPCODE_SHIFT) & OPCODE_MASK));
+    }
+
+    public RCode getRCode() {
+        return RCode.fromValue(flags & RCODE_MASK);
     }
 
     public short getTotalQuestions() {

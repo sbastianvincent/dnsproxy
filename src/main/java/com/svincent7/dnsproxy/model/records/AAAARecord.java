@@ -29,7 +29,7 @@ import java.net.UnknownHostException;
  * 20 01 0d b8 00 00 00 00 00 00 00 00 00 00 00 01          ; RDATA = 2001:db8::1
  */
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Slf4j
 public class AAAARecord extends Record {
     private final byte[] address;

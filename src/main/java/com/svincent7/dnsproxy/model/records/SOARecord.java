@@ -37,7 +37,7 @@ import lombok.ToString;
  * 00 00 07 08                                           ; MINIMUM = 1800
  */
 @Getter
-@ToString
+@ToString(callSuper = true)
 public class SOARecord extends Record {
     private final Name host;
     private final Name admin;

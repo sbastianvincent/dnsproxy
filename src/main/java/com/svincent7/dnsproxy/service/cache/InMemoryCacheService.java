@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Service
 public class InMemoryCacheService implements CacheService {
-    Map<String, Message> cachedResponse = new HashMap<>();
+    private final Map<String, Message> cachedResponse = new HashMap<>();
 
     @Override
     public Message getCachedResponse(final Message message) {

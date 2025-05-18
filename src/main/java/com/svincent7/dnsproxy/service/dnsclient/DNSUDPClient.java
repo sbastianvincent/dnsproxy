@@ -16,7 +16,7 @@ public class DNSUDPClient implements DNSClient {
     }
 
     @Override
-    public byte[] send(byte[] data) throws IOException {
+    public byte[] send(final byte[] data) throws IOException {
         try (DatagramChannel channel = DatagramChannel.open()) {
             channel.configureBlocking(true);
             channel.bind(new InetSocketAddress(0));

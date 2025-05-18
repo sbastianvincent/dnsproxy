@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 @ToString
 public class Name implements Cloneable {
     private final String name;
-    private final int lengthConsumed;
 
     private static final int UNSIGNED_BYTE_MASK = 0xFF;
     private static final int POINTER_FLAG = 0xC0;
@@ -19,14 +18,36 @@ public class Name implements Cloneable {
 
     public Name(final MessageInput messageInput) {
         StringBuilder domain = new StringBuilder();
-        lengthConsumed = readName(messageInput, messageInput.getPosition(), domain, 0);
+        int lengthConsumed = readName(messageInput, messageInput.getPosition(), domain, 0);
         messageInput.setPosition(messageInput.getPosition() + lengthConsumed);
         this.name = domain.toString();
     }
 
     public Name(final Name name) {
         this.name = name.getName();
-        this.lengthConsumed = name.getLengthConsumed();
+    }
+
+    public Name(final String name) {
+        this.name = name;
+    }
+
+    public void toByteResponse(final MessageOutput messageOutput) {
+        String[] labels = name.split("\\.");
+        for (String label : labels) {
+            if (label.isEmpty()) {
+                continue;
+            }
+
+            byte[] labelBytes = label.getBytes(StandardCharsets.UTF_8);
+            messageOutput.writeU8((short) labelBytes.length);
+            messageOutput.writeByteArray(labelBytes, 0, labelBytes.length);
+        }
+        messageOutput.writeU8(0); // end of name
+    }
+
+    @Override
+    public Name clone() {
+        return new Name(this);
     }
 
     private int readName(final MessageInput messageInput, final int startPos, final StringBuilder domain,
@@ -79,24 +100,5 @@ public class Name implements Cloneable {
         }
 
         return totalLength;
-    }
-
-    public void toByteResponse(final MessageOutput messageOutput) {
-        String[] labels = name.split("\\.");
-        for (String label : labels) {
-            if (label.isEmpty()) {
-                continue;
-            }
-
-            byte[] labelBytes = label.getBytes(StandardCharsets.UTF_8);
-            messageOutput.writeU8((short) labelBytes.length);
-            messageOutput.writeByteArray(labelBytes, 0, labelBytes.length);
-        }
-        messageOutput.writeU8(0); // end of name
-    }
-
-    @Override
-    public Name clone() {
-        return new Name(this);
     }
 }
