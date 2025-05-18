@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Slf4j
 @NoArgsConstructor
-public abstract class Record {
+public abstract class Record implements Cloneable {
     protected Name name;
     protected Type type;
     protected DNSClass dnsClass;
@@ -68,4 +68,13 @@ public abstract class Record {
     }
 
     protected abstract void rrToByteResponse(MessageOutput messageOutput);
+
+    @Override
+    public Record clone() {
+        try {
+            return (Record) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Cloning failed", e);
+        }
+    }
 }

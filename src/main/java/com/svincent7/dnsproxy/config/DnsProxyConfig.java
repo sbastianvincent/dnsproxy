@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Configuration properties for the DNS proxy application.
@@ -19,5 +19,6 @@ public class DnsProxyConfig {
 
     private int port;
     private int threadPoolSize;
-    private Set<String> upstreamServers;
+    private List<String> upstreamServers;
+    private String cacheStrategy;
 }

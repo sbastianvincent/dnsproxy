@@ -38,6 +38,12 @@ public class Header {
         }
     }
 
+    public Header(final short transactionId, final short flags, final short[] counts) {
+        this.transactionId = transactionId;
+        this.flags = flags;
+        this.counts = counts;
+    }
+
     public OpCode getOpCode() {
         return OpCode.fromValue((((flags & UNSIGNED_SHORT_MASK) >> OPCODE_SHIFT) & OPCODE_MASK));
     }
