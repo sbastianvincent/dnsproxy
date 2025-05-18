@@ -59,6 +59,18 @@ public class SOARecord extends Record {
         this.minimum = message.readU32();
     }
 
+    public SOARecord(final SOARecord soarecord) {
+        super(soarecord.getName(), soarecord.getType(), soarecord.getDnsClass(), soarecord.getTtl(),
+                soarecord.getLength());
+        this.host = soarecord.getHost().clone();
+        this.admin = soarecord.getAdmin().clone();
+        this.serial = soarecord.getSerial();
+        this.refresh = soarecord.getRefresh();
+        this.retry = soarecord.getRetry();
+        this.expire = soarecord.getExpire();
+        this.minimum = soarecord.getMinimum();
+    }
+
     @Override
     protected void rrToByteResponse(final MessageOutput messageOutput) {
         name.toByteResponse(messageOutput);
@@ -68,5 +80,10 @@ public class SOARecord extends Record {
         messageOutput.writeU32(retry);
         messageOutput.writeU32(expire);
         messageOutput.writeU32(minimum);
+    }
+
+    @Override
+    public Record clone() {
+        return new SOARecord(this);
     }
 }

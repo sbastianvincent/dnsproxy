@@ -19,6 +19,14 @@ public class ParameterIpv4Hint implements ParameterSvcBinding {
         this.addresses = new ArrayList<>();
     }
 
+    public ParameterIpv4Hint(final ParameterIpv4Hint binding) {
+        super();
+        this.addresses = new ArrayList<>();
+        for (final byte[] address : binding.addresses) {
+            this.addresses.add(address.clone());
+        }
+    }
+
     @Override
     public byte[] toByteArr() {
         MessageOutput messageOutput = new MessageOutput();
@@ -37,5 +45,10 @@ public class ParameterIpv4Hint implements ParameterSvcBinding {
         if (messageInput.remaining() > 0) {
             throw new DNSMessageParseException("Unexpected number of bytes in ipv4hint parameter");
         }
+    }
+
+    @Override
+    public ParameterSvcBinding clone() {
+        return new ParameterIpv4Hint(this);
     }
 }

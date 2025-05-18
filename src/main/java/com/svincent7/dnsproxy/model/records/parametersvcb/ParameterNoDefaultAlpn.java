@@ -20,4 +20,9 @@ public class ParameterNoDefaultAlpn implements ParameterSvcBinding {
             throw new DNSMessageParseException("No value should be specified for no default alpn");
         }
     }
+
+    @Override
+    public ParameterSvcBinding clone() {
+        return new ParameterNoDefaultAlpn();
+    }
 }

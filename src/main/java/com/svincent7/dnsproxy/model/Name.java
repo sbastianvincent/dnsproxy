@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 @Getter
 @ToString
-public class Name {
+public class Name implements Cloneable {
     private final String name;
     private final int lengthConsumed;
 
@@ -22,6 +22,11 @@ public class Name {
         lengthConsumed = readName(messageInput, messageInput.getPosition(), domain, 0);
         messageInput.setPosition(messageInput.getPosition() + lengthConsumed);
         this.name = domain.toString();
+    }
+
+    public Name(final Name name) {
+        this.name = name.getName();
+        this.lengthConsumed = name.getLengthConsumed();
     }
 
     private int readName(final MessageInput messageInput, final int startPos, final StringBuilder domain,
@@ -88,5 +93,10 @@ public class Name {
             messageOutput.writeByteArray(labelBytes, 0, labelBytes.length);
         }
         messageOutput.writeU8(0); // end of name
+    }
+
+    @Override
+    public Name clone() {
+        return new Name(this);
     }
 }

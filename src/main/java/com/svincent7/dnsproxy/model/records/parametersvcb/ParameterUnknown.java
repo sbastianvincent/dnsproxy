@@ -12,6 +12,12 @@ public class ParameterUnknown implements ParameterSvcBinding {
         this.key = key;
     }
 
+    public ParameterUnknown(final ParameterUnknown parameter) {
+        super();
+        this.key = parameter.getKey();
+        this.value = parameter.getValue().clone();
+    }
+
     @Override
     public byte[] toByteArr() {
         return value;
@@ -20,5 +26,10 @@ public class ParameterUnknown implements ParameterSvcBinding {
     @Override
     public void fromByteArray(final byte[] bytes) {
         value = bytes;
+    }
+
+    @Override
+    public ParameterSvcBinding clone() {
+        return new ParameterUnknown(this);
     }
 }

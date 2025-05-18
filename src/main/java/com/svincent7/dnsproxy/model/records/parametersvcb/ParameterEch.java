@@ -10,6 +10,11 @@ public class ParameterEch implements ParameterSvcBinding {
         super();
     }
 
+    public ParameterEch(final ParameterEch parameterEch) {
+        super();
+        this.data = parameterEch.data.clone();
+    }
+
     @Override
     public byte[] toByteArr() {
         return data;
@@ -18,5 +23,10 @@ public class ParameterEch implements ParameterSvcBinding {
     @Override
     public void fromByteArray(final byte[] bytes) {
         data = bytes;
+    }
+
+    @Override
+    public ParameterSvcBinding clone() {
+        return new ParameterEch(this);
     }
 }

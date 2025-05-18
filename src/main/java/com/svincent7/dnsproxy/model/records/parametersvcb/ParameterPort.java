@@ -13,6 +13,11 @@ public class ParameterPort implements ParameterSvcBinding {
         super();
     }
 
+    public ParameterPort(final ParameterPort port) {
+        super();
+        this.port = port.getPort();
+    }
+
     @Override
     public byte[] toByteArr() {
         MessageOutput messageOutput = new MessageOutput();
@@ -27,5 +32,10 @@ public class ParameterPort implements ParameterSvcBinding {
         if (message.remaining() > 0) {
             throw new DNSMessageParseException("Unexpected number of bytes in port parameter");
         }
+    }
+
+    @Override
+    public ParameterSvcBinding clone() {
+        return new ParameterPort(this);
     }
 }

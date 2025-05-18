@@ -8,12 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class ParameterAlpn implements ParameterSvcBinding {
+public class ParameterAlpn implements ParameterSvcBinding, Cloneable {
     private final List<byte[]> values;
 
     public ParameterAlpn() {
         super();
         this.values = new ArrayList<>();
+    }
+
+    public ParameterAlpn(final ParameterAlpn parameterAlpn) {
+        super();
+        this.values = new ArrayList<>();
+        for (byte[] value : parameterAlpn.values) {
+            this.values.add(value.clone());
+        }
     }
 
     @Override
@@ -32,5 +40,10 @@ public class ParameterAlpn implements ParameterSvcBinding {
             byte[] b = message.readCountedString();
             values.add(b);
         }
+    }
+
+    @Override
+    public ParameterAlpn clone() {
+        return new ParameterAlpn(this);
     }
 }

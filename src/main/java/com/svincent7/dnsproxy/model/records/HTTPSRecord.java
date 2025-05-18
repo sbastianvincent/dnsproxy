@@ -72,6 +72,17 @@ public class HTTPSRecord extends Record {
         }
     }
 
+    public HTTPSRecord(final HTTPSRecord httpsRecord) {
+        super(httpsRecord.getName().clone(), httpsRecord.getType(), httpsRecord.getDnsClass(), httpsRecord.getTtl(),
+                httpsRecord.getLength());
+        svcPriority = httpsRecord.getSvcPriority();
+        targetName = httpsRecord.getTargetName().clone();
+        svcParams = new TreeMap<>();
+        for (Map.Entry<Short, ParameterSvcBinding> entry : httpsRecord.getSvcParams().entrySet()) {
+            this.svcParams.put(entry.getKey(), entry.getValue().clone());
+        }
+    }
+
     private boolean checkMandatoryParams() {
         ParameterMandatory param = (ParameterMandatory) svcParams.get(ParameterSVCB.MANDATORY.getValue());
         if (param != null) {
@@ -95,5 +106,9 @@ public class HTTPSRecord extends Record {
             messageOutput.writeU16((short) value.length);
             messageOutput.writeByteArray(value);
         }
+    }
+    @Override
+    public Record clone() {
+        return new HTTPSRecord(this);
     }
 }

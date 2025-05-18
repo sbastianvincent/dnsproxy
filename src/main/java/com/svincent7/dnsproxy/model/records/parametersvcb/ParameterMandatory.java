@@ -17,6 +17,12 @@ public class ParameterMandatory implements ParameterSvcBinding {
         this.values = new ArrayList<>();
     }
 
+    public ParameterMandatory(final ParameterMandatory parameterMandatory) {
+        super();
+        this.values = new ArrayList<>();
+        this.values.addAll(parameterMandatory.getValues());
+    }
+
     @Override
     public byte[] toByteArr() {
         MessageOutput message = new MessageOutput();
@@ -36,5 +42,10 @@ public class ParameterMandatory implements ParameterSvcBinding {
         if (message.remaining() > 0) {
             throw new DNSMessageParseException("Unexpected number of values in mandatory parameter");
         }
+    }
+
+    @Override
+    public ParameterSvcBinding clone() {
+        return new ParameterMandatory(this);
     }
 }

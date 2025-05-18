@@ -52,6 +52,12 @@ public class ARecord extends Record {
         ipAddress = getIpAddress(toArray(addr));
     }
 
+    public ARecord(final ARecord record) {
+        super(record.getName().clone(), record.getType(), record.getDnsClass(), record.getTtl(), record.getLength());
+        this.addr = record.getAddr();
+        this.ipAddress = record.getIpAddress();
+    }
+
     private static int fromArray(final byte[] array) {
         return ((array[IP_INDEX_0] & UNSIGNED_BYTE_MASK) << SHIFT_24)
                 | ((array[IP_INDEX_1] & UNSIGNED_BYTE_MASK) << SHIFT_16)
@@ -71,6 +77,11 @@ public class ARecord extends Record {
     @Override
     protected void rrToByteResponse(final MessageOutput messageOutput) {
         messageOutput.writeU32(addr & UNSIGNED_INT_MASK);
+    }
+
+    @Override
+    public Record clone() {
+        return new ARecord(this);
     }
 
     private String getIpAddress(final byte[] bytes) {

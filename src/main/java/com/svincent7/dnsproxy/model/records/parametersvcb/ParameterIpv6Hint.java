@@ -19,6 +19,14 @@ public class ParameterIpv6Hint implements ParameterSvcBinding {
         this.addresses = new ArrayList<>();
     }
 
+    public ParameterIpv6Hint(final ParameterIpv6Hint binding) {
+        super();
+        this.addresses = new ArrayList<>();
+        for (final byte[] address : binding.addresses) {
+            this.addresses.add(address.clone());
+        }
+    }
+
     @Override
     public byte[] toByteArr() {
         MessageOutput messageOutput = new MessageOutput();
@@ -37,5 +45,10 @@ public class ParameterIpv6Hint implements ParameterSvcBinding {
         if (messageInput.remaining() > 0) {
             throw new DNSMessageParseException("Unexpected number of bytes in ipv6hint parameter");
         }
+    }
+
+    @Override
+    public ParameterSvcBinding clone() {
+        return new ParameterIpv6Hint(this);
     }
 }

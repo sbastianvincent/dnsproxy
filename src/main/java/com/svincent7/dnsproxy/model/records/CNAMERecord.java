@@ -38,8 +38,19 @@ public class CNAMERecord extends Record {
         singleName = new Name(message);
     }
 
+    public CNAMERecord(final CNAMERecord cnameRecord) {
+        super(cnameRecord.getName().clone(), cnameRecord.getType(), cnameRecord.getDnsClass(), cnameRecord.getTtl(),
+                cnameRecord.getLength());
+        singleName = cnameRecord.getSingleName().clone();
+    }
+
     @Override
     protected void rrToByteResponse(final MessageOutput messageOutput) {
         singleName.toByteResponse(messageOutput);
+    }
+
+    @Override
+    public Record clone() {
+        return new CNAMERecord(this);
     }
 }

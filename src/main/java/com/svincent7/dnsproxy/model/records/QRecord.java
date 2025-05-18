@@ -11,6 +11,10 @@ public class QRecord extends Record {
         super(name, type, dnsClass);
     }
 
+    public QRecord(final QRecord qRecord) {
+        super(qRecord.getName().clone(), qRecord.getType(), qRecord.getDnsClass());
+    }
+
     @Override
     public void toByteResponse(final MessageOutput messageOutput) {
         name.toByteResponse(messageOutput);
@@ -21,5 +25,10 @@ public class QRecord extends Record {
     @Override
     protected void rrToByteResponse(final MessageOutput messageOutput) {
 
+    }
+
+    @Override
+    public Record clone() {
+        return new QRecord(this);
     }
 }

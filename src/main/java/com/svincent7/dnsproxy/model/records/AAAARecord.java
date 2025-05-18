@@ -46,6 +46,13 @@ public class AAAARecord extends Record {
         this.ipAddress = getIpAddress();
     }
 
+    public AAAARecord(final AAAARecord aaaaRecord) {
+        super(aaaaRecord.getName().clone(), aaaaRecord.getType(), aaaaRecord.getDnsClass(), aaaaRecord.getTtl(),
+                aaaaRecord.getLength());
+        this.address = aaaaRecord.getAddress().clone();
+        this.ipAddress = aaaaRecord.getIpAddress();
+    }
+
     private String getIpAddress() {
         InetAddress inetAddress = null;
         try {
@@ -65,5 +72,10 @@ public class AAAARecord extends Record {
     @Override
     protected void rrToByteResponse(final MessageOutput messageOutput) {
         messageOutput.writeByteArray(address);
+    }
+
+    @Override
+    public Record clone() {
+        return new AAAARecord(this);
     }
 }
