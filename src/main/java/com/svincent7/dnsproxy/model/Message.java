@@ -7,18 +7,15 @@ import com.svincent7.dnsproxy.model.records.RecordFactoryImpl;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
-@Slf4j
 @ToString
-public class Message implements Cloneable {
+public class Message {
     private final Header header;
     private final Map<Integer, List<Record>> sections;
     @Setter
@@ -42,26 +39,6 @@ public class Message implements Cloneable {
                 list.add(recordFactory.getRecordFromDnsMessage(messageInput, i));
             }
             sections.put(i, list);
-        }
-        log.debug("{}: {}", this, header.getOpCode());
-    }
-
-    public Message(final Header header, final Map<Integer, List<Record>> sections) {
-        this.header = header;
-        this.sections = sections;
-    }
-
-    public Message(final Message message) {
-        this.header = new Header(message.getHeader().getTransactionId(),
-                message.getHeader().getFlags(), message.getHeader().getCounts().clone());
-
-        this.sections = new HashMap<>();
-        for (Map.Entry<Integer, List<Record>> entry : message.getSections().entrySet()) {
-            List<Record> clonedList = new ArrayList<>();
-            for (Record record : entry.getValue()) {
-                clonedList.add(record.clone());
-            }
-            this.sections.put(entry.getKey(), clonedList);
         }
     }
 
@@ -102,12 +79,6 @@ public class Message implements Cloneable {
     public void addAnswerRecord(final Record record) {
         getSections().computeIfAbsent(Header.SECTION_ANSWER, k -> new ArrayList<>()).add(record);
         getHeader().getCounts()[Header.SECTION_ANSWER]++;
-    }
-
-
-    @Override
-    public Message clone() {
-        return new Message(this);
     }
 
     private boolean isAllQuestionAnswered() {
