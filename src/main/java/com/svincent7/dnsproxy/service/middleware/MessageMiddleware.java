@@ -19,8 +19,8 @@ public abstract class MessageMiddleware {
     public abstract Message handle(Message message) throws IOException;
 
     protected Message handleNext(final Message message) throws IOException {
-        if (next == null ||
-                (message.isQueryComplete() && (message.isReturnedFromCache() || message.isDNSRewritten()))) {
+        if (next == null
+                || (message.isQueryComplete() && (message.isReturnedFromCache() || message.isDNSRewritten()))) {
             return message;
         }
         return next.handle(message);

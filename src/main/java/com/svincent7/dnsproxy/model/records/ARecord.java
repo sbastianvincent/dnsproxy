@@ -65,7 +65,7 @@ public class ARecord extends Record {
         this.ipAddress = record.getIpAddress();
     }
 
-    public ARecord(final String domainName,final long ttl, final String ipAddress) {
+    public ARecord(final String domainName, final long ttl, final String ipAddress) {
         super(new Name(domainName), Type.A, DNSClass.IN, ttl, IPV4_LENGTH);
         this.ipAddress = ipAddress;
         this.addr = ipToInt(ipAddress);

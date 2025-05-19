@@ -10,7 +10,7 @@ public final class DomainUtils {
     }
 
     /**
-     * Domain Name Rules (RFC 1035 / 1123):
+     * Domain Name Rules (RFC 1035 / 1123).
      *     Only letters (a-z), digits (0-9), and hyphens (-)
      *     Labels (parts between dots) must be 1–63 characters
      *     Domain length ≤ 253 characters
@@ -18,7 +18,7 @@ public final class DomainUtils {
      *     No consecutive dots
      *     No spaces or special characters
      */
-    public static boolean isValidDomainName(String domain) {
+    public static boolean isValidDomainName(final String domain) {
         if (domain == null || domain.length() > MAX_DOMAIN_NAME_LENGTH) {
             return false;
         }

@@ -10,12 +10,12 @@ public class NoopCacheService extends AbstractCacheService {
     }
 
     @Override
-    public DNSCacheEntry getCachedResponse(Record question) {
+    public DNSCacheEntry getCachedResponse(final Record question) {
         return null;
     }
 
     @Override
-    public void cacheResponse(Record question, DNSCacheEntry response) {
+    public void cacheResponse(final Record question, final DNSCacheEntry response) {
 
     }
 }

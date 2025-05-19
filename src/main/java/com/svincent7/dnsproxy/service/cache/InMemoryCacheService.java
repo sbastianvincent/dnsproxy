@@ -35,11 +35,9 @@ public class InMemoryCacheService extends AbstractCacheService {
     }
 
     private String generateKey(final Record record) {
-        String queriedRecord = record.getName() +
-                ":" +
-                record.getType().getValue() +
-                ":" +
-                record.getDnsClass().getValue();
+        String queriedRecord = record.getName()
+                + ":" + record.getType().getValue()
+                + ":" + record.getDnsClass().getValue();
 
         return CryptoUtils.sha256(queriedRecord);
     }

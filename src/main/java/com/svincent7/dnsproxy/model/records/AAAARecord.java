@@ -75,11 +75,11 @@ public class AAAARecord extends Record {
         return inetAddress.getHostAddress();
     }
 
-    public static byte[] ipv6ToBytes(String ipv6Address) {
+    public static byte[] ipv6ToBytes(final String ipv6Address) {
         try {
             InetAddress inetAddress = InetAddress.getByName(ipv6Address);
             byte[] bytes = inetAddress.getAddress();
-            if (bytes.length != 16) {
+            if (bytes.length != IPV6_ADDRESS_LENGTH) {
                 throw new IllegalArgumentException("Not a valid IPv6 address: " + ipv6Address);
             }
             return bytes;

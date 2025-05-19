@@ -90,7 +90,7 @@ public class DnsProxy implements SmartLifecycle {
         log.info("DNS Proxy listener thread stopped.");
     }
 
-    private void handleRequest(DatagramPacket request) {
+    private void handleRequest(final DatagramPacket request) {
         try {
             PacketHandler handler = new UDPHandler(
                     socket, request, cacheService,

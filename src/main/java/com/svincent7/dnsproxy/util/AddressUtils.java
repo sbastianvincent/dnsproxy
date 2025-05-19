@@ -14,13 +14,13 @@ public final class AddressUtils {
     );
 
     private static final Pattern IPV6_PATTERN = Pattern.compile(
-            "^(?:[\\da-fA-F]{1,4}:){7}[\\da-fA-F]{1,4}$|" +              // full form
-                    "^((?:[\\da-fA-F]{1,4}:){1,7}:)$|" +                         // ending with ::
-                    "^(:((?::[\\da-fA-F]{1,4}){1,7}))$|" +                       // starting with ::
-                    "^(::)$"                                                    // just ::
+            "^(?:[\\da-fA-F]{1,4}:){7}[\\da-fA-F]{1,4}$|"          // full form
+                    + "^((?:[\\da-fA-F]{1,4}:){1,7}:)$|"           // ending with ::
+                    + "^(:((?::[\\da-fA-F]{1,4}){1,7}))$|"         // starting with ::
+                    + "^(::)$"                                     // just ::
     );
 
-    public static Type detectType(String input) {
+    public static Type detectType(final String input) {
         if (input == null || input.isEmpty()) {
             return null;
         }
