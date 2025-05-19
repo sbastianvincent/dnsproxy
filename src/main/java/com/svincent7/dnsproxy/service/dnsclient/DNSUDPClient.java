@@ -20,6 +20,7 @@ public class DNSUDPClient implements DNSClient {
         try (DatagramChannel channel = DatagramChannel.open()) {
             channel.configureBlocking(true);
             channel.bind(new InetSocketAddress(0));
+            channel.socket().setSoTimeout(100);
 
             channel.send(ByteBuffer.wrap(data), address);
 

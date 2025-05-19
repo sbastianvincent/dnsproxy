@@ -6,6 +6,7 @@ import com.svincent7.dnsproxy.service.cache.CacheService;
 import com.svincent7.dnsproxy.service.cache.DNSCacheEntry;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -17,7 +18,7 @@ public class CacheLookupMiddleware extends MessageMiddleware {
     }
 
     @Override
-    public Message handle(final Message message) {
+    public Message handle(final Message message) throws IOException {
         List<Record> questions = message.getQuestionRecords();
         for (Record record : questions) {
             DNSCacheEntry dnsCacheEntry = cacheService.getCachedResponse(record);

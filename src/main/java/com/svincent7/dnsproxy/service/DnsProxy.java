@@ -8,12 +8,12 @@ import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProviderFactory;
 import com.svincent7.dnsproxy.service.packet.PacketHandler;
 import com.svincent7.dnsproxy.service.packet.UDPHandler;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
@@ -21,15 +21,16 @@ import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
-public class DnsProxy {
+public class DnsProxy implements SmartLifecycle {
 
     private final DatagramSocket socket;
     private final ExecutorService executor;
     private final CacheService cacheService;
     private final DNSUDPClientFactory dnsudpClientFactory;
     private final DNSRewritesProvider dnsRewritesProvider;
+    private final Thread listenerThread;
 
-    private boolean running = false;
+    private volatile boolean running = false;
 
     private static final int BUFFER_SIZE = 1024;
 
@@ -42,52 +43,63 @@ public class DnsProxy {
         this.cacheService = cacheFactory.getCacheService();
         this.dnsudpClientFactory = dnsudpClientFactory;
         this.dnsRewritesProvider = dnsRewritesProviderFactory.getDNSRewritesProvider();
+        this.listenerThread = new Thread(this::listen);
+        this.listenerThread.setName("dns-proxy-listener");
     }
 
-    @PostConstruct
+    @Override
     public void start() {
-        final Thread thread = new Thread(() -> {
-            try {
-                running = true;
-                byte[] buffer = new byte[BUFFER_SIZE];
-
-                log.info("Starting DNS Proxy on port {}", socket.getLocalPort());
-
-                while (running) {
-                    DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-                    socket.receive(request);
-                    executor.submit(() -> {
-                        try {
-                            PacketHandler handler = new UDPHandler(
-                                    socket, request, cacheService,
-                                    dnsudpClientFactory.createDNSUDPClient(),
-                                    dnsRewritesProvider);
-                            handler.handlePacket();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                if (running) {
-                    e.printStackTrace();
-                }
-            } finally {
-                closeSocket();
-            }
-        });
-        thread.start();
+        if (!running) {
+            running = true;
+            listenerThread.start();
+        }
     }
 
-    @PreDestroy
-    public void destroy() {
-        closeSocket();
-    }
-
-    private void closeSocket() {
-        running = false;
-        if (socket != null && !socket.isClosed()) {
+    @Override
+    public void stop() {
+        if (running) {
+            running = false;
             socket.close();
+            executor.shutdownNow();
+            log.info("Shutting down DNS Proxy...");
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    private void listen() {
+        log.info("Starting DNS Proxy on port {}", socket.getLocalPort());
+        byte[] buffer = new byte[BUFFER_SIZE];
+        running = true;
+
+        while (running) {
+            DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+            try {
+                socket.receive(request);
+                executor.submit(() -> handleRequest(request));
+            } catch (IOException e) {
+                if (running) {
+                    log.error("Error while Running DNS Proxy", e);
+                }
+            }
+        }
+
+        log.info("DNS Proxy listener thread stopped.");
+    }
+
+    private void handleRequest(DatagramPacket request) {
+        try {
+            PacketHandler handler = new UDPHandler(
+                    socket, request, cacheService,
+                    dnsudpClientFactory.createDNSUDPClient(),
+                    dnsRewritesProvider
+            );
+            handler.handlePacket();
+        } catch (IOException e) {
+            log.error("Error while handling UDP Packet", e);
         }
     }
 }

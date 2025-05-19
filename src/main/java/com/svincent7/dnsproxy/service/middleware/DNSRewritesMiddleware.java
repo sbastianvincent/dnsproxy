@@ -5,6 +5,7 @@ import com.svincent7.dnsproxy.model.records.Record;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -18,7 +19,7 @@ public class DNSRewritesMiddleware extends MessageMiddleware {
     }
 
     @Override
-    public Message handle(final Message msg) {
+    public Message handle(final Message msg) throws IOException {
         List<Record> records = msg.getQuestionRecords();
         for (Record question : records) {
             List<Record> dnsRewritesAnswer = dnsRewritesProvider.getDNSRewritesAnswer(question);

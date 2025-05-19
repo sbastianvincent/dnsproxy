@@ -2,6 +2,8 @@ package com.svincent7.dnsproxy.service.middleware;
 
 import com.svincent7.dnsproxy.model.Message;
 
+import java.io.IOException;
+
 public abstract class MessageMiddleware {
     private MessageMiddleware next;
 
@@ -14,9 +16,9 @@ public abstract class MessageMiddleware {
         return firstMiddleware;
     }
 
-    public abstract Message handle(Message message);
+    public abstract Message handle(Message message) throws IOException;
 
-    protected Message handleNext(final Message message) {
+    protected Message handleNext(final Message message) throws IOException {
         if (next == null ||
                 (message.isQueryComplete() && (message.isReturnedFromCache() || message.isDNSRewritten()))) {
             return message;
