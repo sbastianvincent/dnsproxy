@@ -65,6 +65,12 @@ public class ARecord extends Record {
         this.ipAddress = record.getIpAddress();
     }
 
+    public ARecord(final String domainName,final long ttl, final String ipAddress) {
+        super(new Name(domainName), Type.A, DNSClass.IN, ttl, IPV4_LENGTH);
+        this.ipAddress = ipAddress;
+        this.addr = ipToInt(ipAddress);
+    }
+
     private static int fromArray(final byte[] array) {
         return ((array[IP_INDEX_0] & UNSIGNED_BYTE_MASK) << SHIFT_24)
                 | ((array[IP_INDEX_1] & UNSIGNED_BYTE_MASK) << SHIFT_16)

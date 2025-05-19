@@ -1,7 +1,9 @@
 package com.svincent7.dnsproxy.service.dnsrewrites;
 
-import com.svincent7.dnsproxy.model.records.QRecord;
+import com.svincent7.dnsproxy.model.records.Record;
+
+import java.util.List;
 
 public interface DNSRewritesProvider {
-    DNSRewrites getDNSRewrites(QRecord record);
+    List<Record> getDNSRewritesAnswer(Record question);
 }

@@ -46,6 +46,12 @@ public class AAAARecord extends Record {
         this.ipAddress = getIpAddress();
     }
 
+    public AAAARecord(final String domainName, final long ttl, final String ipAddress) {
+        super(new Name(domainName), Type.AAAA, DNSClass.IN, ttl, IPV6_ADDRESS_LENGTH);
+        this.ipAddress = ipAddress;
+        this.address = ipv6ToBytes(ipAddress);
+    }
+
     public AAAARecord(final AAAARecord aaaaRecord) {
         super(aaaaRecord.getName().clone(), aaaaRecord.getType(), aaaaRecord.getDnsClass(), aaaaRecord.getTtl(),
                 aaaaRecord.getLength());
@@ -67,6 +73,19 @@ public class AAAARecord extends Record {
             return IPV4_MAPPED_PREFIX + inetAddress.getHostAddress();
         }
         return inetAddress.getHostAddress();
+    }
+
+    public static byte[] ipv6ToBytes(String ipv6Address) {
+        try {
+            InetAddress inetAddress = InetAddress.getByName(ipv6Address);
+            byte[] bytes = inetAddress.getAddress();
+            if (bytes.length != 16) {
+                throw new IllegalArgumentException("Not a valid IPv6 address: " + ipv6Address);
+            }
+            return bytes;
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException("Invalid IPv6 address: " + ipv6Address, e);
+        }
     }
 
     @Override

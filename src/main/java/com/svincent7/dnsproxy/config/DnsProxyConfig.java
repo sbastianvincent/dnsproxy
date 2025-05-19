@@ -22,7 +22,9 @@ public class DnsProxyConfig {
     private int threadPoolSize;
     private List<String> upstreamServers;
     private String cacheStrategy;
-    private String dnsRewritesProvider;
-    private Map<String, String> dnsRewrites;
     private List<String> allowlistedCacheType;
+    private String dnsRewritesProvider;
+    private Map<String, List<String>> dnsRewrites;
+    private List<String> allowlistedDnsRewritesTypes;
+    private long defaultDnsRewritesTimeout;
 }

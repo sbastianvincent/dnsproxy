@@ -4,6 +4,7 @@ import com.svincent7.dnsproxy.config.DnsProxyConfig;
 import com.svincent7.dnsproxy.service.cache.CacheFactory;
 import com.svincent7.dnsproxy.service.cache.CacheService;
 import com.svincent7.dnsproxy.service.dnsclient.DNSUDPClientFactory;
+import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProviderFactory;
 import com.svincent7.dnsproxy.service.packet.PacketHandler;
 import com.svincent7.dnsproxy.service.packet.UDPHandler;
@@ -26,7 +27,7 @@ public class DnsProxy {
     private final ExecutorService executor;
     private final CacheService cacheService;
     private final DNSUDPClientFactory dnsudpClientFactory;
-    private final DNSRewritesProviderFactory dnsRewritesProviderFactory;
+    private final DNSRewritesProvider dnsRewritesProvider;
 
     private boolean running = false;
 
@@ -40,7 +41,7 @@ public class DnsProxy {
         this.socket = new DatagramSocket(config.getPort());
         this.cacheService = cacheFactory.getCacheService();
         this.dnsudpClientFactory = dnsudpClientFactory;
-        this.dnsRewritesProviderFactory = dnsRewritesProviderFactory;
+        this.dnsRewritesProvider = dnsRewritesProviderFactory.getDNSRewritesProvider();
     }
 
     @PostConstruct
@@ -60,7 +61,7 @@ public class DnsProxy {
                             PacketHandler handler = new UDPHandler(
                                     socket, request, cacheService,
                                     dnsudpClientFactory.createDNSUDPClient(),
-                                    dnsRewritesProviderFactory.getDNSRewritesProvider());
+                                    dnsRewritesProvider);
                             handler.handlePacket();
                         } catch (Exception e) {
                             e.printStackTrace();

@@ -1,12 +1,9 @@
 package com.svincent7.dnsproxy.model;
 
 import com.svincent7.dnsproxy.exception.DNSMessageParseException;
-import com.svincent7.dnsproxy.model.records.ARecord;
 import com.svincent7.dnsproxy.model.records.Record;
 import com.svincent7.dnsproxy.model.records.RecordFactory;
 import com.svincent7.dnsproxy.model.records.RecordFactoryImpl;
-import com.svincent7.dnsproxy.model.records.parametersvcb.ParameterIpv4Hint;
-import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewrites;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Slf4j
@@ -25,12 +23,14 @@ public class Message implements Cloneable {
     private final Map<Integer, List<Record>> sections;
     @Setter
     private boolean isReturnedFromCache = false;
+    @Setter
+    private boolean isDNSRewritten = false;
 
     public static final int TOTAL_SECTION = 4;
 
     public Message(final MessageInput messageInput) throws DNSMessageParseException {
         this.header = new Header(messageInput);
-        this.sections = new HashMap<>();
+        this.sections = new ConcurrentHashMap<>();
         RecordFactory recordFactory = new RecordFactoryImpl();
         for (int i = 0; i < TOTAL_SECTION; i++) {
             List<Record> list = new ArrayList<>();
@@ -66,7 +66,7 @@ public class Message implements Cloneable {
     }
 
     public boolean isQueryComplete() {
-        return header.getRCode().equals(RCode.NOERROR) && header.getTotalQuestions() <= header.getTotalAnswers();
+        return header.getRCode().equals(RCode.NOERROR) && isAllQuestionAnswered();
     }
 
     public void toByteResponse(final MessageOutput messageOutput) {
@@ -81,39 +81,10 @@ public class Message implements Cloneable {
         }
     }
 
-    public static Message fromDNSRewrites(final Message message, final DNSRewrites rewrites) {
-        short[] counts = message.getHeader().getCounts().clone();
-        counts[Header.SECTION_ANSWER] = 1;
-
-        Header clonedHeader = new Header(message.getHeader().getTransactionId(),
-                message.getHeader().getFlags(), counts);
-
-        Record questionRecord = message.getSections()
-                .get(Header.SECTION_QUESTION)
-                .get(0);
-
-        Map<Integer, List<Record>> clonedSections = new HashMap<>();
-
-        // Add Question Section
-        List<Record> questionRecords = new ArrayList<>();
-        questionRecords.add(questionRecord);
-        clonedSections.put(Header.SECTION_QUESTION, questionRecords);
-
-        // Add Answer Section
-        List<Record> answerList = new ArrayList<>();
-        Record answerRecord = new ARecord(questionRecord.getName(), questionRecord.getType(),
-                questionRecord.getDnsClass(), DNSRewrites.DEFAULT_REWRITE_TTL, ParameterIpv4Hint.IPV4_ADDRESS_LENGTH,
-                rewrites.getAnswer());
-        answerList.add(answerRecord);
-        clonedSections.put(Header.SECTION_ANSWER, answerList);
-
-        return new Message(clonedHeader, clonedSections);
-    }
-
     public List<Record> getQuestionRecords() {
         if (!getSections().containsKey(Header.SECTION_QUESTION) || getSections().get(Header.SECTION_QUESTION)
                 .isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
 
         return getSections().get(Header.SECTION_QUESTION);
@@ -122,18 +93,27 @@ public class Message implements Cloneable {
     public List<Record> getAnswerRecords() {
         if (!getSections().containsKey(Header.SECTION_ANSWER) || getSections().get(Header.SECTION_ANSWER)
                 .isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
 
         return getSections().get(Header.SECTION_ANSWER);
     }
 
     public void addAnswerRecord(final Record record) {
-        getSections().getOrDefault(Header.SECTION_ANSWER, new ArrayList<>()).add(record);
+        getSections().computeIfAbsent(Header.SECTION_ANSWER, k -> new ArrayList<>()).add(record);
+        getHeader().getCounts()[Header.SECTION_ANSWER]++;
     }
+
 
     @Override
     public Message clone() {
         return new Message(this);
     }
+
+    private boolean isAllQuestionAnswered() {
+        return getQuestionRecords().stream().allMatch(
+                q -> getAnswerRecords().stream().anyMatch(a -> a.getType().equals(q.getType()))
+        );
+    }
+
 }

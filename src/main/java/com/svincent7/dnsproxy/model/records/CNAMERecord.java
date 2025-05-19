@@ -44,6 +44,11 @@ public class CNAMERecord extends Record {
         singleName = cnameRecord.getSingleName().clone();
     }
 
+    public CNAMERecord(final String domainName, final long ttl, final Name cname) {
+        super(new Name(domainName), Type.CNAME, DNSClass.IN, ttl, cname.getLength());
+        singleName = cname;
+    }
+
     @Override
     protected void rrToByteResponse(final MessageOutput messageOutput) {
         singleName.toByteResponse(messageOutput);

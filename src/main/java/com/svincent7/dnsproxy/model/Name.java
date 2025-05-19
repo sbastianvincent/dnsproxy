@@ -45,6 +45,26 @@ public class Name implements Cloneable {
         messageOutput.writeU8(0); // end of name
     }
 
+    public int getLength() {
+        if (name == null || name.isEmpty()) {
+            return 1; // root label (just the terminating 0)
+        }
+
+        String[] labels = name.split("\\.");
+        int length = 0;
+
+        for (String label : labels) {
+            if (label.isEmpty()) {
+                continue;
+            }
+            length += 1; // length byte
+            length += label.getBytes(StandardCharsets.UTF_8).length;
+        }
+
+        length += 1; // null byte at end
+        return length;
+    }
+
     @Override
     public Name clone() {
         return new Name(this);
