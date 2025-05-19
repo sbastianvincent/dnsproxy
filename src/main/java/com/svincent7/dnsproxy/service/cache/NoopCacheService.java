@@ -1,16 +1,21 @@
 package com.svincent7.dnsproxy.service.cache;
 
-import com.svincent7.dnsproxy.model.Message;
+import com.svincent7.dnsproxy.config.DnsProxyConfig;
+import com.svincent7.dnsproxy.model.records.Record;
 
-public class NoopCacheService implements CacheService {
+public class NoopCacheService extends AbstractCacheService {
+
+    public NoopCacheService(final DnsProxyConfig config) {
+        super(config);
+    }
 
     @Override
-    public Message getCachedResponse(final Message message) {
+    public DNSCacheEntry getCachedResponse(Record question) {
         return null;
     }
 
     @Override
-    public void cacheResponse(final Message message) {
+    public void cacheResponse(Record question, DNSCacheEntry response) {
 
     }
 }

@@ -17,8 +17,8 @@ public class CacheFactoryImpl implements CacheFactory {
     public CacheService getCacheService() {
         log.info("Create cache service with strategy: {}", config.getCacheStrategy());
         return switch (config.getCacheStrategy()) {
-            case IN_MEMORY_CACHE -> new InMemoryCacheService();
-            default -> new NoopCacheService();
+            case IN_MEMORY_CACHE -> new InMemoryCacheService(config);
+            default -> new NoopCacheService(config);
         };
     }
 }

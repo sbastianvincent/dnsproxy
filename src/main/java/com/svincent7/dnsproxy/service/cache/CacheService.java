@@ -1,8 +1,12 @@
 package com.svincent7.dnsproxy.service.cache;
 
-import com.svincent7.dnsproxy.model.Message;
+import com.svincent7.dnsproxy.model.Type;
+import com.svincent7.dnsproxy.model.records.Record;
+
+import java.util.Set;
 
 public interface CacheService {
-    Message getCachedResponse(Message message);
-    void cacheResponse(Message message);
+    Set<Type> getAllowlistedCacheTypes();
+    DNSCacheEntry getCachedResponse(Record question);
+    void cacheResponse(Record question, DNSCacheEntry response);
 }

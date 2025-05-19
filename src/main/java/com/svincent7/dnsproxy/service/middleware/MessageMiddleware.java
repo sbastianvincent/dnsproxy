@@ -17,7 +17,7 @@ public abstract class MessageMiddleware {
     public abstract Message handle(Message message);
 
     protected Message handleNext(final Message message) {
-        if (next == null || message.isQueryComplete()) {
+        if (next == null || (message.isQueryComplete() && message.isReturnedFromCache())) {
             return message;
         }
         return next.handle(message);

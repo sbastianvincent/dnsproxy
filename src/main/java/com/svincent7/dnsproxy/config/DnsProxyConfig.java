@@ -24,4 +24,5 @@ public class DnsProxyConfig {
     private String cacheStrategy;
     private String dnsRewritesProvider;
     private Map<String, String> dnsRewrites;
+    private List<String> allowlistedCacheType;
 }

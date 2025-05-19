@@ -1,8 +1,12 @@
 package com.svincent7.dnsproxy.service.middleware;
 
 import com.svincent7.dnsproxy.model.Message;
+import com.svincent7.dnsproxy.model.records.Record;
 import com.svincent7.dnsproxy.service.cache.CacheService;
+import com.svincent7.dnsproxy.service.cache.DNSCacheEntry;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @Slf4j
 public class CacheLookupMiddleware extends MessageMiddleware {
@@ -14,11 +18,16 @@ public class CacheLookupMiddleware extends MessageMiddleware {
 
     @Override
     public Message handle(final Message message) {
-        Message cachedMessage = cacheService.getCachedResponse(message);
-        if (cachedMessage == null) {
-            return handleNext(message);
+        List<Record> questions = message.getQuestionRecords();
+        for (Record record : questions) {
+            DNSCacheEntry dnsCacheEntry = cacheService.getCachedResponse(record);
+            if (dnsCacheEntry == null) {
+                continue;
+            }
+            log.debug("Got dnsCacheEntry: {}", dnsCacheEntry);
+            message.addAnswerRecord(record);
+            message.setReturnedFromCache(true);
         }
-        log.debug("Got cached response: {}", cachedMessage);
-        return handleNext(Message.fromCachedMessage(message, cachedMessage));
+        return handleNext(message);
     }
 }

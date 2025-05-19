@@ -1,47 +1,46 @@
 package com.svincent7.dnsproxy.service.cache;
 
-import com.svincent7.dnsproxy.model.Header;
-import com.svincent7.dnsproxy.model.Message;
+import com.svincent7.dnsproxy.config.DnsProxyConfig;
 import com.svincent7.dnsproxy.model.records.Record;
 import com.svincent7.dnsproxy.util.CryptoUtils;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-@Service
-public class InMemoryCacheService implements CacheService {
-    private final Map<String, Message> cachedResponse = new HashMap<>();
+public class InMemoryCacheService extends AbstractCacheService {
+    private final Map<String, DNSCacheEntry> cachedResponse = new HashMap<>();
 
-    @Override
-    public Message getCachedResponse(final Message message) {
-        String key = generateKey(message);
-        return cachedResponse.get(key);
+    public InMemoryCacheService(final DnsProxyConfig config) {
+        super(config);
     }
 
     @Override
-    public void cacheResponse(final Message message) {
-        String key = generateKey(message);
-        cachedResponse.put(key, message);
-    }
-
-    private String generateKey(final Message message) {
-        List<Record> questions = message.getSections().get(Header.SECTION_QUESTION);
-        if (questions == null || questions.isEmpty()) {
+    public DNSCacheEntry getCachedResponse(final Record question) {
+        String key = generateKey(question);
+        DNSCacheEntry entry = cachedResponse.get(key);
+        if (entry == null) {
             return null;
         }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Record question : questions) {
-            stringBuilder
-                    .append(question.getName())
-                    .append(":")
-                    .append(question.getType().getValue())
-                    .append(":")
-                    .append(question.getDnsClass().getValue());
+        if (entry.getExpiredTime() < System.currentTimeMillis()) {
+            cachedResponse.remove(key);
+            return null;
         }
+        return entry;
+    }
 
-        return CryptoUtils.sha256(stringBuilder.toString());
+    @Override
+    public void cacheResponse(final Record question, final DNSCacheEntry response) {
+        String key = generateKey(question);
+        cachedResponse.put(key, response);
+    }
+
+    private String generateKey(final Record record) {
+        String queriedRecord = record.getName() +
+                ":" +
+                record.getType().getValue() +
+                ":" +
+                record.getDnsClass().getValue();
+
+        return CryptoUtils.sha256(queriedRecord);
     }
 }

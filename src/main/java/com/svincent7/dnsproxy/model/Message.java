@@ -8,6 +8,7 @@ import com.svincent7.dnsproxy.model.records.RecordFactoryImpl;
 import com.svincent7.dnsproxy.model.records.parametersvcb.ParameterIpv4Hint;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewrites;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +23,8 @@ import java.util.Map;
 public class Message implements Cloneable {
     private final Header header;
     private final Map<Integer, List<Record>> sections;
+    @Setter
+    private boolean isReturnedFromCache = false;
 
     public static final int TOTAL_SECTION = 4;
 
@@ -107,20 +110,26 @@ public class Message implements Cloneable {
         return new Message(clonedHeader, clonedSections);
     }
 
-    public static Message fromCachedMessage(final Message requestMessage, final Message cachedMessage) {
-        Header clonedHeader = new Header(requestMessage.getHeader().getTransactionId(),
-                requestMessage.getHeader().getFlags(), requestMessage.getHeader().getCounts().clone());
-
-        Map<Integer, List<Record>> clonedSections = new HashMap<>();
-        for (Map.Entry<Integer, List<Record>> entry : cachedMessage.getSections().entrySet()) {
-            List<Record> clonedList = new ArrayList<>();
-            for (Record record : entry.getValue()) {
-                clonedList.add(record.clone());
-            }
-            clonedSections.put(entry.getKey(), clonedList);
+    public List<Record> getQuestionRecords() {
+        if (!getSections().containsKey(Header.SECTION_QUESTION) || getSections().get(Header.SECTION_QUESTION)
+                .isEmpty()) {
+            return null;
         }
 
-        return new Message(clonedHeader, clonedSections);
+        return getSections().get(Header.SECTION_QUESTION);
+    }
+
+    public List<Record> getAnswerRecords() {
+        if (!getSections().containsKey(Header.SECTION_ANSWER) || getSections().get(Header.SECTION_ANSWER)
+                .isEmpty()) {
+            return null;
+        }
+
+        return getSections().get(Header.SECTION_ANSWER);
+    }
+
+    public void addAnswerRecord(final Record record) {
+        getSections().getOrDefault(Header.SECTION_ANSWER, new ArrayList<>()).add(record);
     }
 
     @Override
