@@ -25,7 +25,7 @@ public class CacheLookupMiddleware extends MessageMiddleware {
                 continue;
             }
             log.debug("Got dnsCacheEntry: {}", dnsCacheEntry);
-            message.addAnswerRecord(record);
+            message.addAnswerRecord(dnsCacheEntry.getAnswer());
             message.setReturnedFromCache(true);
         }
         return handleNext(message);
