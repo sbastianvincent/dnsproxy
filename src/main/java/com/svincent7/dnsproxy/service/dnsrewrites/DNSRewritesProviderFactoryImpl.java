@@ -14,7 +14,7 @@ public class DNSRewritesProviderFactoryImpl implements DNSRewritesProviderFactor
 
     @Override
     public DNSRewritesProvider getDNSRewritesProvider() {
-        log.info("Getting DNS Rewrites provider with: {}", config.getCacheStrategy());
+        log.debug("Getting DNS Rewrites provider with: {}", config.getCacheStrategy());
         return switch (config.getDnsRewritesProvider()) {
             default -> new ConfigFileDnsRewritesProvider(config);
         };

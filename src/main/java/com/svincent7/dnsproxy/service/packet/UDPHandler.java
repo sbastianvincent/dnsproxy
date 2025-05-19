@@ -36,6 +36,8 @@ public class UDPHandler implements PacketHandler {
 
     @Override
     public void handlePacket() throws Exception {
+        long startTime = System.currentTimeMillis();
+        log.debug("UDP packet received from {}", packet.getAddress().getHostAddress());
         final MessageInput messageInput = new MessageInput(packet.getData());
         final Message message = new Message(messageInput);
 
@@ -50,5 +52,7 @@ public class UDPHandler implements PacketHandler {
                 packet.getPort()
         );
         socket.send(reply);
+        long endTime = System.currentTimeMillis();
+        log.debug("DNS response sent in {}ms", endTime - startTime);
     }
 }
