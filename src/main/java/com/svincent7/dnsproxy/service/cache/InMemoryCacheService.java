@@ -4,11 +4,11 @@ import com.svincent7.dnsproxy.config.DnsProxyConfig;
 import com.svincent7.dnsproxy.model.records.Record;
 import com.svincent7.dnsproxy.util.CryptoUtils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryCacheService extends AbstractCacheService {
-    private final Map<String, DNSCacheEntry> cachedResponse = new HashMap<>();
+    private final Map<String, DNSCacheEntry> cachedResponse = new ConcurrentHashMap<>();
 
     public InMemoryCacheService(final DnsProxyConfig config) {
         super(config);

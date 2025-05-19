@@ -53,6 +53,6 @@ public class UDPHandler implements PacketHandler {
         );
         socket.send(reply);
         long endTime = System.currentTimeMillis();
-        log.debug("DNS response sent in {}ms", endTime - startTime);
+        log.debug("DNS response {} sent in {}ms", responseMessage, endTime - startTime);
     }
 }

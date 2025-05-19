@@ -38,7 +38,6 @@ public class CacheAnswerMiddleware extends MessageMiddleware {
                     dnsCacheEntry.setAnswer(answer);
                     dnsCacheEntry.setExpiredTime(System.currentTimeMillis() + answer.getTtl() * MILLIS_PER_SECOND);
                     cacheService.cacheResponse(question, dnsCacheEntry);
-                    break;
                 }
             }
         }
