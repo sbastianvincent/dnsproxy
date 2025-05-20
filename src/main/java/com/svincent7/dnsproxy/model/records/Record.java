@@ -55,7 +55,8 @@ public abstract class Record implements Cloneable {
         this.ttl = ttl;
     }
 
-    public void toByteResponse(final MessageOutput messageOutput) {
+    public int toByteResponse(final MessageOutput messageOutput, final int maxPacketSize) {
+        int current = messageOutput.getPos();
         name.toByteResponse(messageOutput);
         messageOutput.writeU16(type.getValue());
         messageOutput.writeU16(dnsClass.getValue());
@@ -65,6 +66,11 @@ public abstract class Record implements Cloneable {
         rrToByteResponse(messageOutput);
         int rrLength = messageOutput.getPos() - lengthPosition - 2;
         messageOutput.writeU16At(rrLength, lengthPosition);
+        int packetSize = messageOutput.getPos() - current;
+        if (messageOutput.getPos() > maxPacketSize) {
+            messageOutput.setPos(current);
+        }
+        return packetSize;
     }
 
     protected abstract void rrToByteResponse(MessageOutput messageOutput);

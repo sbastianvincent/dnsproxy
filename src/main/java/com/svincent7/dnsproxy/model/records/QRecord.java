@@ -16,10 +16,16 @@ public class QRecord extends Record {
     }
 
     @Override
-    public void toByteResponse(final MessageOutput messageOutput) {
+    public int toByteResponse(final MessageOutput messageOutput, final int maxPacketSize) {
+        int current = messageOutput.getPos();
         name.toByteResponse(messageOutput);
         messageOutput.writeU16(type.getValue());
         messageOutput.writeU16(dnsClass.getValue());
+        int packetSize = messageOutput.getPos() - current;
+        if (messageOutput.getPos() > maxPacketSize) {
+            messageOutput.setPos(current);
+        }
+        return packetSize;
     }
 
     @Override

@@ -1,12 +1,14 @@
 package com.svincent7.dnsproxy.model;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
 @ToString
 public class MessageOutput {
     private byte[] data;
+    @Setter
     private int pos;
 
     private static final int BYTE_SIZE = 1;

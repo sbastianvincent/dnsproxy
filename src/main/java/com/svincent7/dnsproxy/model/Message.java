@@ -7,6 +7,7 @@ import com.svincent7.dnsproxy.model.records.RecordFactoryImpl;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @ToString
+@Slf4j
 public class Message {
     private final Header header;
     private final Map<Integer, List<Record>> sections;
@@ -46,16 +48,32 @@ public class Message {
         return header.getRCode().equals(RCode.NOERROR) && isAllQuestionAnswered();
     }
 
-    public void toByteResponse(final MessageOutput messageOutput) {
+    public void toByteResponse(final MessageOutput messageOutput, final int maxPacketSize) {
         header.toByteResponse(messageOutput);
+        int packetSize = messageOutput.getData().length;
+        int additional = getHeader().getCounts()[Header.SECTION_ADDITIONAL_RR];
         for (int i = 0; i < TOTAL_SECTION; i++) {
             if (sections.get(i) == null) {
                 continue;
             }
             for (Record record : sections.get(i)) {
-                record.toByteResponse(messageOutput);
+                int recordSize = record.toByteResponse(messageOutput, maxPacketSize);
+                if (packetSize + recordSize > maxPacketSize) {
+                    if (i != Header.SECTION_ADDITIONAL_RR) {
+                        log.debug("Skipping additional rr and adding flag");
+                        getHeader().setFlag(Flags.TC);
+                        // re-write the header flag
+                        messageOutput.writeU16At(getHeader().getFlags(), Header.FLAGS_POSITION);
+                    } else {
+                        additional--;
+                    }
+                    break;
+                }
+                packetSize = messageOutput.getData().length;
             }
         }
+        getHeader().getCounts()[Header.SECTION_ADDITIONAL_RR] = (short) additional;
+        messageOutput.writeU16At(getHeader().getCounts()[Header.SECTION_ADDITIONAL_RR], Header.ADDITIONAL_POSITION);
     }
 
     public List<Record> getQuestionRecords() {

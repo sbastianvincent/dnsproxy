@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString
 public class Header {
     private final short transactionId;
-    private final short flags;
+    private short flags;
     private final short[] counts;
 
     public static final int SECTION_QUESTION = 0;
@@ -25,10 +25,14 @@ public class Header {
     public static final int SECTION_AUTHORITY_RR = SECTION_ANSWER + 1;
     public static final int SECTION_ADDITIONAL_RR = SECTION_AUTHORITY_RR + 1;
 
+    public static final int FLAGS_POSITION = 2;
+    public static final int ADDITIONAL_POSITION = 10;
+
     private static final int UNSIGNED_SHORT_MASK = 0xFFFF;
     private static final int OPCODE_MASK = 0xF;
     private static final int OPCODE_SHIFT = 11;
     private static final int RCODE_MASK = 0x000F;
+    private static final int FLAGS_BIT_LENGTH = 15;
 
     public Header(final MessageInput messageInput) {
         this.transactionId = messageInput.readU16();
@@ -53,12 +57,8 @@ public class Header {
         return RCode.fromValue(flags & RCODE_MASK);
     }
 
-    public short getTotalQuestions() {
-        return counts[SECTION_QUESTION];
-    }
-
-    public short getTotalAnswers() {
-        return counts[SECTION_ANSWER];
+    public void setFlag(final Flags flag) {
+        flags |= (short) (1 << (FLAGS_BIT_LENGTH - flag.getValue()));
     }
 
     public void toByteResponse(final MessageOutput messageOutput) {
