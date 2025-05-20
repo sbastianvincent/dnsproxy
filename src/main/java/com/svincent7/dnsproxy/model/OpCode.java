@@ -26,7 +26,7 @@ public enum OpCode {
     NOTIFY(4),
     UPDATE(5);
 
-    private int value;
+    private final int value;
     OpCode(final int value) {
         this.value = value;
     }

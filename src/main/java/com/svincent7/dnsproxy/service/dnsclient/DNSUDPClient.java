@@ -13,6 +13,7 @@ public class DNSUDPClient implements DNSClient {
 
     private static final int BUFFER_SIZE = 512;
     private static final int DEFAULT_TIMEOUT = 5000;
+    private static final int DNS_UDP_PACKET_SIZE = 512;
 
     public DNSUDPClient(final String ip, final int port) {
         this.address = new InetSocketAddress(ip, port);
@@ -49,5 +50,10 @@ public class DNSUDPClient implements DNSClient {
                 return response;
             }
         }
+    }
+
+    @Override
+    public int getMaxPacketSize() {
+        return DNS_UDP_PACKET_SIZE;
     }
 }

@@ -4,13 +4,8 @@ import com.svincent7.dnsproxy.model.Message;
 import com.svincent7.dnsproxy.model.MessageInput;
 import com.svincent7.dnsproxy.model.MessageOutput;
 import com.svincent7.dnsproxy.service.cache.CacheService;
-import com.svincent7.dnsproxy.service.dnsclient.DNSUDPClient;
+import com.svincent7.dnsproxy.service.dnsclient.DNSClient;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
-import com.svincent7.dnsproxy.service.middleware.CacheAnswerMiddleware;
-import com.svincent7.dnsproxy.service.middleware.CacheLookupMiddleware;
-import com.svincent7.dnsproxy.service.middleware.DNSRewritesMiddleware;
-import com.svincent7.dnsproxy.service.middleware.MessageMiddleware;
-import com.svincent7.dnsproxy.service.middleware.UpstreamQueryMiddleware;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -18,42 +13,38 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 @Slf4j
-public class UDPHandler implements PacketHandler {
+public class UDPHandler extends AbstractPacketHandler {
     private final DatagramSocket socket;
     private final DatagramPacket packet;
-    private final MessageMiddleware middleware;
+
+    private static final int MAX_PACKET_SIZE = 512;
 
     public UDPHandler(final DatagramSocket socket, final DatagramPacket packet, final CacheService cacheService,
-                      final DNSUDPClient dnsudpClient, final DNSRewritesProvider dnsRewritesProvider) {
+                      final DNSClient dnsClient, final DNSRewritesProvider dnsRewritesProvider) {
+        super(dnsRewritesProvider, cacheService, dnsClient);
         this.socket = socket;
         this.packet = packet;
-        this.middleware = MessageMiddleware.link(
-                new DNSRewritesMiddleware(dnsRewritesProvider),
-                new CacheLookupMiddleware(cacheService),
-                new UpstreamQueryMiddleware(dnsudpClient),
-                new CacheAnswerMiddleware(cacheService)
-        );
     }
 
     @Override
-    public void handlePacket() throws IOException {
-        long startTime = System.currentTimeMillis();
-        log.debug("UDP packet received from {}", packet.getAddress().getHostAddress());
+    protected int getMaxPacketSize() {
+        return MAX_PACKET_SIZE;
+    }
+
+    @Override
+    protected Message getMessageFromInput() throws IOException {
         final MessageInput messageInput = new MessageInput(packet.getData());
-        final Message message = new Message(messageInput);
+        return new Message(messageInput);
+    }
 
-        Message responseMessage = middleware.handle(message);
-
-        MessageOutput request = new MessageOutput();
-        responseMessage.toByteResponse(request);
+    @Override
+    protected void sendResponse(final MessageOutput messageOutput) throws IOException {
         DatagramPacket reply = new DatagramPacket(
-                request.getData(),
-                request.getData().length,
+                messageOutput.getData(),
+                messageOutput.getData().length,
                 packet.getAddress(),
                 packet.getPort()
         );
         socket.send(reply);
-        long endTime = System.currentTimeMillis();
-        log.debug("DNS response {} sent in {}ms", responseMessage, endTime - startTime);
     }
 }
