@@ -3,13 +3,15 @@ package com.svincent7.dnsproxy.service.packet;
 import com.svincent7.dnsproxy.model.Message;
 import com.svincent7.dnsproxy.model.MessageOutput;
 import com.svincent7.dnsproxy.service.cache.CacheService;
-import com.svincent7.dnsproxy.service.dnsclient.DNSClient;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
 import com.svincent7.dnsproxy.service.middleware.CacheAnswerMiddleware;
 import com.svincent7.dnsproxy.service.middleware.CacheLookupMiddleware;
 import com.svincent7.dnsproxy.service.middleware.DNSRewritesMiddleware;
 import com.svincent7.dnsproxy.service.middleware.MessageMiddleware;
-import com.svincent7.dnsproxy.service.middleware.UpstreamQueryMiddleware;
+import com.svincent7.dnsproxy.service.middleware.NoopMiddleware;
+import com.svincent7.dnsproxy.service.middleware.UpstreamTCPQueryMiddleware;
+import com.svincent7.dnsproxy.service.middleware.UpstreamUDPQueryMiddleware;
+import com.svincent7.dnsproxy.service.resolver.DNSResolverFactory;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -19,11 +21,13 @@ public abstract class AbstractPacketHandler implements PacketHandler {
     private final MessageMiddleware middleware;
 
     public AbstractPacketHandler(final DNSRewritesProvider dnsRewritesProvider, final CacheService cacheService,
-                                 final DNSClient dnsClient) {
+                                 final DNSResolverFactory dnsResolverFactory) {
         this.middleware = MessageMiddleware.link(
                 new DNSRewritesMiddleware(dnsRewritesProvider),
                 new CacheLookupMiddleware(cacheService),
-                new UpstreamQueryMiddleware(dnsClient),
+                getClass().getSimpleName().equals("UDPHandler") ?
+                        new UpstreamUDPQueryMiddleware(dnsResolverFactory) : new NoopMiddleware(),
+                new UpstreamTCPQueryMiddleware(dnsResolverFactory),
                 new CacheAnswerMiddleware(cacheService)
         );
     }

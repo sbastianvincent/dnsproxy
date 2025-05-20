@@ -18,7 +18,7 @@ public class CacheLookupMiddleware extends MessageMiddleware {
     }
 
     @Override
-    public Message handle(final Message message) throws IOException {
+    protected Message handleInternal(final Message message) throws IOException {
         List<Record> questions = message.getQuestionRecords();
         for (Record record : questions) {
             DNSCacheEntry dnsCacheEntry = cacheService.getCachedResponse(record);
@@ -30,5 +30,10 @@ public class CacheLookupMiddleware extends MessageMiddleware {
             message.setReturnedFromCache(true);
         }
         return handleNext(message);
+    }
+
+    @Override
+    protected boolean shouldSkipMiddleware(final Message msg) {
+        return msg.isQueryComplete();
     }
 }

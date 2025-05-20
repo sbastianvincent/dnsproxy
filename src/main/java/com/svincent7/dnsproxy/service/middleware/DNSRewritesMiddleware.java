@@ -19,7 +19,7 @@ public class DNSRewritesMiddleware extends MessageMiddleware {
     }
 
     @Override
-    public Message handle(final Message msg) throws IOException {
+    protected Message handleInternal(final Message msg) throws IOException {
         List<Record> records = msg.getQuestionRecords();
         for (Record question : records) {
             List<Record> dnsRewritesAnswer = dnsRewritesProvider.getDNSRewritesAnswer(question);
@@ -34,5 +34,10 @@ public class DNSRewritesMiddleware extends MessageMiddleware {
             msg.setDNSRewritten(true);
         }
         return handleNext(msg);
+    }
+
+    @Override
+    protected boolean shouldSkipMiddleware(final Message msg) {
+        return msg.isQueryComplete();
     }
 }

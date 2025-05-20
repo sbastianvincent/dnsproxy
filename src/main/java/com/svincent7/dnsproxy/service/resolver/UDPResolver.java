@@ -1,4 +1,4 @@
-package com.svincent7.dnsproxy.service.dnsclient;
+package com.svincent7.dnsproxy.service.resolver;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -8,14 +8,14 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
-public class DNSUDPClient implements DNSClient {
+public class UDPResolver implements Resolver {
     private final InetSocketAddress address;
 
     private static final int BUFFER_SIZE = 512;
     private static final int DEFAULT_TIMEOUT = 5000;
     private static final int DNS_UDP_PACKET_SIZE = 512;
 
-    public DNSUDPClient(final String ip, final int port) {
+    public UDPResolver(final String ip, final int port) {
         this.address = new InetSocketAddress(ip, port);
     }
 

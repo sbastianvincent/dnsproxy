@@ -3,7 +3,7 @@ package com.svincent7.dnsproxy.service;
 import com.svincent7.dnsproxy.config.DnsProxyConfig;
 import com.svincent7.dnsproxy.service.cache.CacheFactory;
 import com.svincent7.dnsproxy.service.cache.CacheService;
-import com.svincent7.dnsproxy.service.dnsclient.DNSUDPClientFactory;
+import com.svincent7.dnsproxy.service.resolver.DNSResolverFactory;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProviderFactory;
 import com.svincent7.dnsproxy.service.packet.PacketHandler;
@@ -30,7 +30,7 @@ public class DnsProxy implements SmartLifecycle {
     private final ServerSocket tcpSocket;
     private final ExecutorService executor;
     private final CacheService cacheService;
-    private final DNSUDPClientFactory dnsudpClientFactory;
+    private final DNSResolverFactory dnsResolverFactory;
     private final DNSRewritesProvider dnsRewritesProvider;
     private final Thread listenerUDPThread;
     private final Thread listenerTCPThread;
@@ -41,13 +41,13 @@ public class DnsProxy implements SmartLifecycle {
 
     @Autowired
     public DnsProxy(final DnsProxyConfig config, final CacheFactory cacheFactory,
-                    final DNSUDPClientFactory dnsudpClientFactory,
+                    final DNSResolverFactory dnsResolverFactory,
                     final DNSRewritesProviderFactory dnsRewritesProviderFactory) throws Exception {
         this.executor = Executors.newFixedThreadPool(config.getThreadPoolSize());
         this.udpSocket = new DatagramSocket(config.getPort());
         this.tcpSocket = new ServerSocket(config.getPort());
         this.cacheService = cacheFactory.getCacheService();
-        this.dnsudpClientFactory = dnsudpClientFactory;
+        this.dnsResolverFactory = dnsResolverFactory;
         this.dnsRewritesProvider = dnsRewritesProviderFactory.getDNSRewritesProvider();
         this.listenerUDPThread = new Thread(this::listenUdp);
         this.listenerUDPThread.setName("dns-udp-proxy-listener");
@@ -125,8 +125,9 @@ public class DnsProxy implements SmartLifecycle {
     private void handleUdpRequest(final DatagramPacket request) {
         try {
             PacketHandler handler = new UDPHandler(
-                    udpSocket, request, cacheService,
-                    dnsudpClientFactory.createDNSUDPClient(),
+                    udpSocket, request,
+                    cacheService,
+                    dnsResolverFactory,
                     dnsRewritesProvider
             );
             handler.handlePacket();
@@ -140,7 +141,7 @@ public class DnsProxy implements SmartLifecycle {
             PacketHandler handler = new TCPHandler(
                     socket,
                     cacheService,
-                    dnsudpClientFactory.createDNSUDPClient(),
+                    dnsResolverFactory,
                     dnsRewritesProvider
             );
             handler.handlePacket();

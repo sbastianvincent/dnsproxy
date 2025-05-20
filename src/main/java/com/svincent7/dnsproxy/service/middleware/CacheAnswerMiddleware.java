@@ -20,11 +20,7 @@ public class CacheAnswerMiddleware extends MessageMiddleware {
     }
 
     @Override
-    public Message handle(final Message message) throws IOException {
-        if (!message.isQueryComplete()) {
-            return handleNext(message);
-        }
-
+    protected Message handleInternal(final Message message) throws IOException {
         List<Record> questions = message.getQuestionRecords();
         List<Record> answers = message.getAnswerRecords();
         for (Record question : questions) {
@@ -43,5 +39,10 @@ public class CacheAnswerMiddleware extends MessageMiddleware {
             }
         }
         return handleNext(message);
+    }
+
+    @Override
+    protected boolean shouldSkipMiddleware(final Message msg) {
+        return !msg.isQueryComplete() || msg.isDNSRewritten() || msg.isReturnedFromCache();
     }
 }

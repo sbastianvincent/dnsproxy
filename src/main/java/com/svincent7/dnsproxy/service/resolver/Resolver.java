@@ -1,8 +1,8 @@
-package com.svincent7.dnsproxy.service.dnsclient;
+package com.svincent7.dnsproxy.service.resolver;
 
 import java.io.IOException;
 
-public interface DNSClient {
+public interface Resolver {
 
     byte[] send(byte[] data) throws IOException;
     int getMaxPacketSize();
