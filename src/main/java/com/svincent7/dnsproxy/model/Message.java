@@ -50,7 +50,6 @@ public class Message {
 
     public void toByteResponse(final MessageOutput messageOutput, final int maxPacketSize) {
         header.toByteResponse(messageOutput);
-        int packetSize = messageOutput.getData().length;
         int additional = getHeader().getCounts()[Header.SECTION_ADDITIONAL_RR];
         for (int i = 0; i < TOTAL_SECTION; i++) {
             if (sections.get(i) == null) {
@@ -58,7 +57,7 @@ public class Message {
             }
             for (Record record : sections.get(i)) {
                 int recordSize = record.toByteResponse(messageOutput, maxPacketSize);
-                if (packetSize + recordSize > maxPacketSize) {
+                if (messageOutput.getPos() + recordSize > maxPacketSize) {
                     if (i != Header.SECTION_ADDITIONAL_RR) {
                         log.debug("Skipping additional rr and adding flag");
                         getHeader().setFlag(Flags.TC);
@@ -69,7 +68,6 @@ public class Message {
                     }
                     break;
                 }
-                packetSize = messageOutput.getData().length;
             }
         }
         getHeader().getCounts()[Header.SECTION_ADDITIONAL_RR] = (short) additional;

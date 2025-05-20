@@ -37,11 +37,10 @@ public abstract class AbstractPacketHandler implements PacketHandler {
 
         MessageOutput request = new MessageOutput();
         responseMessage.toByteResponse(request, getMaxPacketSize());
-        log.debug("Response: {}", request);
 
         sendResponse(request);
         long endTime = System.currentTimeMillis();
-        log.debug("DNS response {} sent in {}ms", responseMessage, endTime - startTime);
+        log.debug("({}ms) DNS response {} - Byte: {}", endTime - startTime, responseMessage, request);
     }
 
     protected abstract int getMaxPacketSize();
