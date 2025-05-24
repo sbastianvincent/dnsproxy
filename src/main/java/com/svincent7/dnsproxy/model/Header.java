@@ -53,6 +53,11 @@ public class Header {
         return OpCode.fromValue((((flags & UNSIGNED_SHORT_MASK) >> OPCODE_SHIFT) & OPCODE_MASK));
     }
 
+    public void setRCode(final RCode rcode) {
+        flags &= ~RCODE_MASK;
+        flags |= (short) (rcode.getValue() & RCODE_MASK);
+    }
+
     public RCode getRCode() {
         return RCode.fromValue(flags & RCODE_MASK);
     }
@@ -69,11 +74,19 @@ public class Header {
         return isFlagSet(Flags.TC);
     }
 
+    public void setNxDomain() {
+        setRCode(RCode.NXDOMAIN);
+    }
+
     public void toByteResponse(final MessageOutput messageOutput) {
         messageOutput.writeU16(transactionId);
         messageOutput.writeU16(flags);
         for (short count: counts) {
             messageOutput.writeU16(count);
         }
+    }
+
+    public void incrementCount(final int section) {
+        counts[section]++;
     }
 }

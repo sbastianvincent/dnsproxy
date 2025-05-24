@@ -8,10 +8,12 @@ import com.svincent7.dnsproxy.model.records.ARecord;
 import com.svincent7.dnsproxy.model.records.CNAMERecord;
 import com.svincent7.dnsproxy.util.AddressUtils;
 import com.svincent7.dnsproxy.util.DomainUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class ConfigFileDnsRewritesProvider extends AbstractDNSRewritesProvider {
 
     public ConfigFileDnsRewritesProvider(final DnsProxyConfig config) {
@@ -24,10 +26,11 @@ public class ConfigFileDnsRewritesProvider extends AbstractDNSRewritesProvider {
         for (Map.Entry<String, List<String>> entry : dnsRewrites.entrySet()) {
             String domain = entry.getKey();
             if (!DomainUtils.isValidDomainName(domain)) {
+                log.warn("Skipping DNS Rewrites because of Invalid domain name: " + domain);
                 continue;
             }
-            // Add trailing dot only if it doesn't exist
-            domain = domain.endsWith(".") ? domain : domain + ".";
+
+            domain = DomainUtils.ensureFqdnName(domain);
 
             List<String> rewrites = entry.getValue();
             for (String rewrite : rewrites) {

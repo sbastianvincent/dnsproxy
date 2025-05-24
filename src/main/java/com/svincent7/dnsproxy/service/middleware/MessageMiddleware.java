@@ -27,7 +27,7 @@ public abstract class MessageMiddleware {
     }
 
     protected Message handleNext(final Message message) throws IOException {
-        if (next == null) {
+        if (next == null || message.isBlockedResponse()) {
             return message;
         }
         return next.handle(message);

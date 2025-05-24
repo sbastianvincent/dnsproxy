@@ -19,11 +19,22 @@ public final class DomainUtils {
      *     No spaces or special characters
      */
     public static boolean isValidDomainName(final String domain) {
-        if (domain == null || domain.length() > MAX_DOMAIN_NAME_LENGTH) {
+        if (domain == null) {
             return false;
         }
 
-        String[] labels = domain.split("\\.");
+        String d = domain.endsWith(".") ? domain.substring(0, domain.length() - 1) : domain;
+
+        boolean hasWildcard = d.startsWith("*.");
+        if (hasWildcard) {
+            d = d.substring(2); // remove "*."
+        }
+
+        if (d.length() > MAX_DOMAIN_NAME_LENGTH) {
+            return false;
+        }
+
+        String[] labels = d.split("\\.");
         for (String label : labels) {
             if (label.isEmpty() || label.length() > MAX_DOMAIN_LABEL_LENGTH) {
                 return false;
@@ -34,6 +45,18 @@ public final class DomainUtils {
         }
 
         return true;
+    }
+
+    public static String ensureFqdnName(final String domainName) {
+        if (!isValidDomainName(domainName)) {
+            throw new IllegalArgumentException("Invalid domain name: " + domainName);
+        }
+
+        if (domainName.endsWith(".")) {
+            return domainName.toLowerCase();
+        } else {
+            return domainName.toLowerCase() + ".";
+        }
     }
 
 }

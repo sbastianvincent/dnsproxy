@@ -2,8 +2,10 @@ package com.svincent7.dnsproxy.service.packet;
 
 import com.svincent7.dnsproxy.model.Message;
 import com.svincent7.dnsproxy.model.MessageOutput;
+import com.svincent7.dnsproxy.service.blocklist.BlocklistDictionary;
 import com.svincent7.dnsproxy.service.cache.CacheService;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
+import com.svincent7.dnsproxy.service.middleware.BlocklistMiddleware;
 import com.svincent7.dnsproxy.service.middleware.CacheAnswerMiddleware;
 import com.svincent7.dnsproxy.service.middleware.CacheLookupMiddleware;
 import com.svincent7.dnsproxy.service.middleware.DNSRewritesMiddleware;
@@ -20,9 +22,12 @@ import java.io.IOException;
 public abstract class AbstractPacketHandler implements PacketHandler {
     private final MessageMiddleware middleware;
 
-    public AbstractPacketHandler(final DNSRewritesProvider dnsRewritesProvider, final CacheService cacheService,
+    public AbstractPacketHandler(final BlocklistDictionary blocklistDictionary,
+                                 final DNSRewritesProvider dnsRewritesProvider,
+                                 final CacheService cacheService,
                                  final DNSResolverFactory dnsResolverFactory) {
         this.middleware = MessageMiddleware.link(
+                new BlocklistMiddleware(blocklistDictionary),
                 new DNSRewritesMiddleware(dnsRewritesProvider),
                 new CacheLookupMiddleware(cacheService),
                 getClass().getSimpleName().equals("UDPHandler")
@@ -36,6 +41,7 @@ public abstract class AbstractPacketHandler implements PacketHandler {
     public void handlePacket() throws IOException {
         long startTime = System.currentTimeMillis();
         final Message message = getMessageFromInput();
+        log.debug("Request {}", message);
 
         Message responseMessage = middleware.handle(message);
 

@@ -1,6 +1,7 @@
 package com.svincent7.dnsproxy.service;
 
 import com.svincent7.dnsproxy.config.DnsProxyConfig;
+import com.svincent7.dnsproxy.service.blocklist.BlocklistDictionary;
 import com.svincent7.dnsproxy.service.cache.CacheFactory;
 import com.svincent7.dnsproxy.service.cache.CacheService;
 import com.svincent7.dnsproxy.service.resolver.DNSResolverFactory;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class DnsProxy implements SmartLifecycle {
 
+    private final BlocklistDictionary blocklistDictionary;
     private final DatagramSocket udpSocket;
     private final ServerSocket tcpSocket;
     private final ExecutorService executor;
@@ -40,12 +42,15 @@ public class DnsProxy implements SmartLifecycle {
     private static final int BUFFER_SIZE = 1024;
 
     @Autowired
-    public DnsProxy(final DnsProxyConfig config, final CacheFactory cacheFactory,
+    public DnsProxy(final BlocklistDictionary blocklistDictionary,
+                    final DnsProxyConfig config,
+                    final CacheFactory cacheFactory,
                     final DNSResolverFactory dnsResolverFactory,
                     final DNSRewritesProviderFactory dnsRewritesProviderFactory) throws Exception {
         this.executor = Executors.newFixedThreadPool(config.getThreadPoolSize());
         this.udpSocket = new DatagramSocket(config.getPort());
         this.tcpSocket = new ServerSocket(config.getPort());
+        this.blocklistDictionary = blocklistDictionary;
         this.cacheService = cacheFactory.getCacheService();
         this.dnsResolverFactory = dnsResolverFactory;
         this.dnsRewritesProvider = dnsRewritesProviderFactory.getDNSRewritesProvider();
@@ -125,7 +130,9 @@ public class DnsProxy implements SmartLifecycle {
     private void handleUdpRequest(final DatagramPacket request) {
         try {
             PacketHandler handler = new UDPHandler(
-                    udpSocket, request,
+                    blocklistDictionary,
+                    udpSocket,
+                    request,
                     cacheService,
                     dnsResolverFactory,
                     dnsRewritesProvider
@@ -139,6 +146,7 @@ public class DnsProxy implements SmartLifecycle {
     private void handleTcpRequest(final Socket socket) {
         try {
             PacketHandler handler = new TCPHandler(
+                    blocklistDictionary,
                     socket,
                     cacheService,
                     dnsResolverFactory,

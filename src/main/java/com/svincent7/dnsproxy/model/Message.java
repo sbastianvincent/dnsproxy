@@ -14,15 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Getter
 @ToString
 @Slf4j
 public class Message {
     private final Header header;
     private final Map<Integer, List<Record>> sections;
     @Setter
+    @Getter
     private boolean isReturnedFromCache = false;
     @Setter
+    @Getter
     private boolean isDNSRewritten = false;
 
     public static final int TOTAL_SECTION = 4;
@@ -48,9 +49,13 @@ public class Message {
         return header.getRCode().equals(RCode.NOERROR) && isAllQuestionAnswered();
     }
 
+    public boolean isBlockedResponse() {
+        return header.getRCode() == RCode.NXDOMAIN || header.getRCode() == RCode.REFUSED;
+    }
+
     public void toByteResponse(final MessageOutput messageOutput, final int maxPacketSize) {
         header.toByteResponse(messageOutput);
-        int additional = getHeader().getCounts()[Header.SECTION_ADDITIONAL_RR];
+        int additional = header.getCounts()[Header.SECTION_ADDITIONAL_RR];
         for (int i = 0; i < TOTAL_SECTION; i++) {
             if (sections.get(i) == null) {
                 continue;
@@ -60,9 +65,9 @@ public class Message {
                 if (messageOutput.getPos() + recordSize > maxPacketSize) {
                     if (i != Header.SECTION_ADDITIONAL_RR) {
                         log.debug("Skipping additional rr and adding flag");
-                        getHeader().setFlag(Flags.TC);
+                        header.setFlag(Flags.TC);
                         // re-write the header flag
-                        messageOutput.writeU16At(getHeader().getFlags(), Header.FLAGS_POSITION);
+                        messageOutput.writeU16At(header.getFlags(), Header.FLAGS_POSITION);
                     } else {
                         additional--;
                     }
@@ -70,35 +75,41 @@ public class Message {
                 }
             }
         }
-        getHeader().getCounts()[Header.SECTION_ADDITIONAL_RR] = (short) additional;
-        messageOutput.writeU16At(getHeader().getCounts()[Header.SECTION_ADDITIONAL_RR], Header.ADDITIONAL_POSITION);
+        header.getCounts()[Header.SECTION_ADDITIONAL_RR] = (short) additional;
+        messageOutput.writeU16At(header.getCounts()[Header.SECTION_ADDITIONAL_RR], Header.ADDITIONAL_POSITION);
     }
 
     public List<Record> getQuestionRecords() {
-        if (!getSections().containsKey(Header.SECTION_QUESTION) || getSections().get(Header.SECTION_QUESTION)
+        if (!sections.containsKey(Header.SECTION_QUESTION) || sections.get(Header.SECTION_QUESTION)
                 .isEmpty()) {
             return new ArrayList<>();
         }
 
-        return getSections().get(Header.SECTION_QUESTION);
+        return sections.get(Header.SECTION_QUESTION);
     }
 
     public List<Record> getAnswerRecords() {
-        if (!getSections().containsKey(Header.SECTION_ANSWER) || getSections().get(Header.SECTION_ANSWER)
+        if (!sections.containsKey(Header.SECTION_ANSWER) || sections.get(Header.SECTION_ANSWER)
                 .isEmpty()) {
             return new ArrayList<>();
         }
 
-        return getSections().get(Header.SECTION_ANSWER);
+        return sections.get(Header.SECTION_ANSWER);
     }
 
     public void addAnswerRecord(final Record record) {
-        getSections().computeIfAbsent(Header.SECTION_ANSWER, k -> new ArrayList<>()).add(record);
-        getHeader().getCounts()[Header.SECTION_ANSWER]++;
+        sections.computeIfAbsent(Header.SECTION_ANSWER, k -> new ArrayList<>()).add(record);
+        header.incrementCount(Header.SECTION_ANSWER);
+        header.setFlag(Flags.QR);
+    }
+
+    public void setBlocked() {
+        header.setNxDomain();
+        header.setFlag(Flags.QR);
     }
 
     public boolean isTruncated() {
-        return getHeader().isTruncated();
+        return header.isTruncated();
     }
 
     private boolean isAllQuestionAnswered() {

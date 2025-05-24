@@ -23,3 +23,6 @@ dnsproxy:
     - AAAA
     - CNAME
   default-dns-rewrites-timeout: 60
+  blocklisted:
+    - blocked.com
+    - "*.blocked.com"
