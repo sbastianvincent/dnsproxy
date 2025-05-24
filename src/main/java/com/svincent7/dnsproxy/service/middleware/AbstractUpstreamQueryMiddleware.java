@@ -5,9 +5,11 @@ import com.svincent7.dnsproxy.model.MessageInput;
 import com.svincent7.dnsproxy.model.MessageOutput;
 import com.svincent7.dnsproxy.service.resolver.DNSResolverFactory;
 import com.svincent7.dnsproxy.service.resolver.Resolver;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+@Slf4j
 public abstract class AbstractUpstreamQueryMiddleware extends MessageMiddleware {
 
     private final DNSResolverFactory resolverFactory;
@@ -21,6 +23,7 @@ public abstract class AbstractUpstreamQueryMiddleware extends MessageMiddleware 
         Resolver resolver = getResolver(resolverFactory);
         MessageOutput request = new MessageOutput();
         msg.toByteResponse(request, resolver.getMaxPacketSize());
+        log.debug("resolver: {} - request: {}", resolver.getAddress(), request);
         byte[] response = resolver.send(request.getData());
         Message responseMessage = new Message(new MessageInput(response));
         return handleNext(responseMessage);

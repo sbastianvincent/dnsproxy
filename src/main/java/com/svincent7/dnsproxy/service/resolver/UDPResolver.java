@@ -1,5 +1,7 @@
 package com.svincent7.dnsproxy.service.resolver;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -8,6 +10,7 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
+@Getter
 public class UDPResolver implements Resolver {
     private final InetSocketAddress address;
 

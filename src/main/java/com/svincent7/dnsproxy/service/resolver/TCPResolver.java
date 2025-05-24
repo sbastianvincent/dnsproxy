@@ -1,5 +1,7 @@
 package com.svincent7.dnsproxy.service.resolver;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -7,6 +9,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
+@Getter
 public class TCPResolver implements Resolver {
     private final InetSocketAddress address;
 
