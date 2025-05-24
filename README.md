@@ -31,7 +31,7 @@ cd dnsproxy
 ```
 ### 3. Run the DNS Proxy
 ```
-java -jar ./target/dnsproxy.jar
+java -jar ./target/dnsproxy-0.1.1-SNAPSHOT.jar
 ```
 
 ## ⚙️ Configuration
