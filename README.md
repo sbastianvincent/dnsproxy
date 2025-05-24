@@ -36,11 +36,13 @@ java -jar ./target/dnsproxy.jar
 
 ## ⚙️ Configuration
 
-Edit `src/main/resources/application.properties:`
+Edit `src/main/resources/application.yml:`
 ```
-dnsproxy.port=53
-dnsproxy.thread-pool-size=5
-dnsproxy.upstream-servers=1.1.1.1, 8.8.8.8
+dnsproxy:
+  port: 53
+  upstream-servers:
+    - 1.1.1.1
+    - 8.8.8.8
 ```
 Or pass as command-line args:
 ```
