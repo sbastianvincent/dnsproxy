@@ -15,6 +15,7 @@ public class TCPResolver implements Resolver {
 
     private static final int DEFAULT_TIMEOUT = 5000;
     private static final int DNS_TCP_PACKET_SIZE = 65535;
+    private static final int UNSIGNED_SHORT_MASK = 0xFFFF;
 
     public TCPResolver(final String ip, final int port) {
         this.address = new InetSocketAddress(ip, port);
@@ -66,7 +67,7 @@ public class TCPResolver implements Resolver {
                     }
                 }
                 lengthBuffer.flip();
-                int responseLength = lengthBuffer.getShort() & 0xFFFF;
+                int responseLength = lengthBuffer.getShort() & UNSIGNED_SHORT_MASK;
 
                 // Read the DNS response
                 ByteBuffer receiveBuffer = ByteBuffer.allocate(responseLength);

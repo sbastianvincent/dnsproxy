@@ -25,8 +25,8 @@ public abstract class AbstractPacketHandler implements PacketHandler {
         this.middleware = MessageMiddleware.link(
                 new DNSRewritesMiddleware(dnsRewritesProvider),
                 new CacheLookupMiddleware(cacheService),
-                getClass().getSimpleName().equals("UDPHandler") ?
-                        new UpstreamUDPQueryMiddleware(dnsResolverFactory) : new NoopMiddleware(),
+                getClass().getSimpleName().equals("UDPHandler")
+                        ? new UpstreamUDPQueryMiddleware(dnsResolverFactory) : new NoopMiddleware(),
                 new UpstreamTCPQueryMiddleware(dnsResolverFactory),
                 new CacheAnswerMiddleware(cacheService)
         );

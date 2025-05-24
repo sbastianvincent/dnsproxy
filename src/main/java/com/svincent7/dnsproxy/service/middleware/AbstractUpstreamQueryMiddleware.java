@@ -12,15 +12,14 @@ import java.io.IOException;
 @Slf4j
 public abstract class AbstractUpstreamQueryMiddleware extends MessageMiddleware {
 
-    private final DNSResolverFactory resolverFactory;
+    private final Resolver resolver;
 
     public AbstractUpstreamQueryMiddleware(final DNSResolverFactory resolverFactory) {
-        this.resolverFactory = resolverFactory;
+        this.resolver = getResolver(resolverFactory);
     }
 
     @Override
     protected Message handleInternal(final Message msg) throws IOException {
-        Resolver resolver = getResolver(resolverFactory);
         MessageOutput request = new MessageOutput();
         msg.toByteResponse(request, resolver.getMaxPacketSize());
         log.debug("resolver: {} - request: {}", resolver.getAddress(), request);
