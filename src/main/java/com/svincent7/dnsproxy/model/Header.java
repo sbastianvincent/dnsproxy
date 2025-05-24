@@ -61,6 +61,14 @@ public class Header {
         flags |= (short) (1 << (FLAGS_BIT_LENGTH - flag.getValue()));
     }
 
+    public boolean isFlagSet(final Flags flag) {
+        return (flags & (1 << (FLAGS_BIT_LENGTH - flag.getValue()))) != 0;
+    }
+
+    public boolean isTruncated() {
+        return isFlagSet(Flags.TC);
+    }
+
     public void toByteResponse(final MessageOutput messageOutput) {
         messageOutput.writeU16(transactionId);
         messageOutput.writeU16(flags);

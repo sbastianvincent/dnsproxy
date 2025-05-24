@@ -19,6 +19,6 @@ public class UpstreamTCPQueryMiddleware extends AbstractUpstreamQueryMiddleware 
 
     @Override
     protected boolean shouldSkipMiddleware(final Message msg) {
-        return msg.isQueryComplete();
+        return msg.isQueryComplete() || !msg.isTruncated();
     }
 }

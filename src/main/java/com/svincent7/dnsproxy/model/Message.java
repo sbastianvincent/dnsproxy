@@ -97,6 +97,10 @@ public class Message {
         getHeader().getCounts()[Header.SECTION_ANSWER]++;
     }
 
+    public boolean isTruncated() {
+        return getHeader().isTruncated();
+    }
+
     private boolean isAllQuestionAnswered() {
         return getQuestionRecords().stream().allMatch(
                 q -> getAnswerRecords().stream().anyMatch(a -> a.getType().equals(q.getType()))
