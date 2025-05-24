@@ -23,6 +23,10 @@ public final class DomainUtils {
             return false;
         }
 
+        if (isWildcard(domain)) {
+            return true;
+        }
+
         String d = domain.endsWith(".") ? domain.substring(0, domain.length() - 1) : domain;
 
         boolean hasWildcard = d.startsWith("*.");
@@ -55,6 +59,10 @@ public final class DomainUtils {
     }
 
     public static String ensureFqdnName(final String domainName) {
+        if (isWildcard(domainName)) {
+            return domainName;
+        }
+
         if (!isValidDomainName(domainName)) {
             throw new IllegalArgumentException("Invalid domain name: " + domainName);
         }

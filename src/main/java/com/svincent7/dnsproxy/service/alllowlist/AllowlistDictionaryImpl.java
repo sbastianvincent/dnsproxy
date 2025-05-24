@@ -28,15 +28,10 @@ public class AllowlistDictionaryImpl implements AllowlistDictionary {
     public void reloadAllowlist() {
         Set<String> newAllowlist = new ConcurrentSkipListSet<>();
         for (AllowlistProvider provider : providers) {
-            for (String domain : provider.getAllowlist()) {
-                if (DomainUtils.isWildcard(domain)) {
-                    newAllowlist.add(domain);
-                } else if (DomainUtils.isValidDomainName(domain)) {
-                    newAllowlist.add(DomainUtils.ensureFqdnName(domain));
-                } else {
-                    log.warn("Invalid allowlist entry: {}", domain);
-                }
-            }
+            provider.getAllowlist().stream()
+                    .filter(DomainUtils::isValidDomainName)
+                    .map(DomainUtils::ensureFqdnName)
+                    .forEach(newAllowlist::add);
         }
         allowlist = newAllowlist;
         log.debug("allowlist: {}", allowlist);
