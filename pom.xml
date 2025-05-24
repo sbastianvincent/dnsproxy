@@ -15,10 +15,9 @@
 	<url>https://github.com/sbastianvincent/dnsproxy</url>
 	<licenses>
 		<license>
-			<name>MIT License</name>
-			<url>https://opensource.org/licenses/MIT</url>
+			<name>BSD-3-Clause</name>
+			<url>https://opensource.org/licenses/BSD-3-Clause</url>
 			<distribution>repo</distribution>
-			<comments>MIT license for open source usage</comments>
 		</license>
 	</licenses>
 	<developers>
