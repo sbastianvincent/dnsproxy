@@ -3,6 +3,7 @@ package com.svincent7.dnsproxy.service.packet;
 import com.svincent7.dnsproxy.model.Message;
 import com.svincent7.dnsproxy.model.MessageInput;
 import com.svincent7.dnsproxy.model.MessageOutput;
+import com.svincent7.dnsproxy.service.alllowlist.AllowlistDictionary;
 import com.svincent7.dnsproxy.service.blocklist.BlocklistDictionary;
 import com.svincent7.dnsproxy.service.cache.CacheService;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
@@ -21,12 +22,13 @@ public class UDPHandler extends AbstractPacketHandler {
     private static final int MAX_PACKET_SIZE = 512;
 
     public UDPHandler(final BlocklistDictionary blocklistDictionary,
+                      final AllowlistDictionary allowlistDictionary,
                       final DatagramSocket socket,
                       final DatagramPacket packet,
                       final CacheService cacheService,
                       final DNSResolverFactory dnsResolverFactory,
                       final DNSRewritesProvider dnsRewritesProvider) {
-        super(blocklistDictionary, dnsRewritesProvider, cacheService, dnsResolverFactory);
+        super(blocklistDictionary, allowlistDictionary, dnsRewritesProvider, cacheService, dnsResolverFactory);
         this.socket = socket;
         this.packet = packet;
     }

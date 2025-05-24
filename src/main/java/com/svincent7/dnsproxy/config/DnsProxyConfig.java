@@ -27,6 +27,7 @@ public class DnsProxyConfig {
     private Map<String, List<String>> dnsRewrites;
     private List<String> allowlistedDnsRewritesTypes;
     private long defaultDnsRewritesTimeout;
-    private List<String> blocklisted;
+    private List<String> blocklistedDomains;
+    private List<String> allowlistedDomains;
 
 }

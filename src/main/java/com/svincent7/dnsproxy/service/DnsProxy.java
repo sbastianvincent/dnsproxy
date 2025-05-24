@@ -1,6 +1,7 @@
 package com.svincent7.dnsproxy.service;
 
 import com.svincent7.dnsproxy.config.DnsProxyConfig;
+import com.svincent7.dnsproxy.service.alllowlist.AllowlistDictionary;
 import com.svincent7.dnsproxy.service.blocklist.BlocklistDictionary;
 import com.svincent7.dnsproxy.service.cache.CacheFactory;
 import com.svincent7.dnsproxy.service.cache.CacheService;
@@ -28,6 +29,7 @@ import java.util.concurrent.Executors;
 public class DnsProxy implements SmartLifecycle {
 
     private final BlocklistDictionary blocklistDictionary;
+    private final AllowlistDictionary allowlistDictionary;
     private final DatagramSocket udpSocket;
     private final ServerSocket tcpSocket;
     private final ExecutorService executor;
@@ -43,6 +45,7 @@ public class DnsProxy implements SmartLifecycle {
 
     @Autowired
     public DnsProxy(final BlocklistDictionary blocklistDictionary,
+                    final AllowlistDictionary allowlistDictionary,
                     final DnsProxyConfig config,
                     final CacheFactory cacheFactory,
                     final DNSResolverFactory dnsResolverFactory,
@@ -51,6 +54,7 @@ public class DnsProxy implements SmartLifecycle {
         this.udpSocket = new DatagramSocket(config.getPort());
         this.tcpSocket = new ServerSocket(config.getPort());
         this.blocklistDictionary = blocklistDictionary;
+        this.allowlistDictionary = allowlistDictionary;
         this.cacheService = cacheFactory.getCacheService();
         this.dnsResolverFactory = dnsResolverFactory;
         this.dnsRewritesProvider = dnsRewritesProviderFactory.getDNSRewritesProvider();
@@ -131,6 +135,7 @@ public class DnsProxy implements SmartLifecycle {
         try {
             PacketHandler handler = new UDPHandler(
                     blocklistDictionary,
+                    allowlistDictionary,
                     udpSocket,
                     request,
                     cacheService,
@@ -147,6 +152,7 @@ public class DnsProxy implements SmartLifecycle {
         try {
             PacketHandler handler = new TCPHandler(
                     blocklistDictionary,
+                    allowlistDictionary,
                     socket,
                     cacheService,
                     dnsResolverFactory,

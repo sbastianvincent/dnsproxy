@@ -47,6 +47,13 @@ public final class DomainUtils {
         return true;
     }
 
+    public static boolean isWildcard(final String domain) {
+        if (domain == null) {
+            return false;
+        }
+        return domain.equals("*");
+    }
+
     public static String ensureFqdnName(final String domainName) {
         if (!isValidDomainName(domainName)) {
             throw new IllegalArgumentException("Invalid domain name: " + domainName);

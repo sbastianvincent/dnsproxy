@@ -1,4 +1,4 @@
-package com.svincent7.dnsproxy.service.blocklist;
+package com.svincent7.dnsproxy.service.alllowlist;
 
 import com.svincent7.dnsproxy.config.DnsProxyConfig;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +9,11 @@ import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-public class ConfigFileBlocklistProvider implements BlocklistProvider {
+public class ConfigFileAllowlistProvider implements AllowlistProvider {
     private final DnsProxyConfig config;
 
     @Override
-    public Set<String> getBlocklists() {
-        return new HashSet<>(config.getBlocklistedDomains());
+    public Set<String> getAllowlist() {
+        return new HashSet<>(config.getAllowlistedDomains());
     }
 }

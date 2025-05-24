@@ -2,9 +2,11 @@ package com.svincent7.dnsproxy.service.packet;
 
 import com.svincent7.dnsproxy.model.Message;
 import com.svincent7.dnsproxy.model.MessageOutput;
+import com.svincent7.dnsproxy.service.alllowlist.AllowlistDictionary;
 import com.svincent7.dnsproxy.service.blocklist.BlocklistDictionary;
 import com.svincent7.dnsproxy.service.cache.CacheService;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
+import com.svincent7.dnsproxy.service.middleware.AllowlistMiddleware;
 import com.svincent7.dnsproxy.service.middleware.BlocklistMiddleware;
 import com.svincent7.dnsproxy.service.middleware.CacheAnswerMiddleware;
 import com.svincent7.dnsproxy.service.middleware.CacheLookupMiddleware;
@@ -23,11 +25,13 @@ public abstract class AbstractPacketHandler implements PacketHandler {
     private final MessageMiddleware middleware;
 
     public AbstractPacketHandler(final BlocklistDictionary blocklistDictionary,
+                                 final AllowlistDictionary allowlistDictionary,
                                  final DNSRewritesProvider dnsRewritesProvider,
                                  final CacheService cacheService,
                                  final DNSResolverFactory dnsResolverFactory) {
         this.middleware = MessageMiddleware.link(
                 new BlocklistMiddleware(blocklistDictionary),
+                new AllowlistMiddleware(allowlistDictionary),
                 new DNSRewritesMiddleware(dnsRewritesProvider),
                 new CacheLookupMiddleware(cacheService),
                 getClass().getSimpleName().equals("UDPHandler")

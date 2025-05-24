@@ -4,6 +4,7 @@ import com.svincent7.dnsproxy.exception.DNSMessageParseException;
 import com.svincent7.dnsproxy.model.Message;
 import com.svincent7.dnsproxy.model.MessageInput;
 import com.svincent7.dnsproxy.model.MessageOutput;
+import com.svincent7.dnsproxy.service.alllowlist.AllowlistDictionary;
 import com.svincent7.dnsproxy.service.blocklist.BlocklistDictionary;
 import com.svincent7.dnsproxy.service.cache.CacheService;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
@@ -22,11 +23,12 @@ public class TCPHandler extends AbstractPacketHandler {
     private static final int SHIFT_8 = 8;
 
     public TCPHandler(final BlocklistDictionary blocklistDictionary,
+                      final AllowlistDictionary allowlistDictionary,
                       final Socket socket,
                       final CacheService cacheService,
                       final DNSResolverFactory dnsResolverFactory,
                       final DNSRewritesProvider dnsRewritesProvider) {
-        super(blocklistDictionary, dnsRewritesProvider, cacheService, dnsResolverFactory);
+        super(blocklistDictionary, allowlistDictionary, dnsRewritesProvider, cacheService, dnsResolverFactory);
         this.socket = socket;
     }
 
