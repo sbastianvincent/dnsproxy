@@ -9,21 +9,21 @@ import java.util.Map;
 @Getter
 @ToString
 public enum ParameterSVCB {
-    MANDATORY((short) 0),
-    ALPN((short) 1),
-    NO_DEFAULT_ALPN((short) 2),
-    PORT((short) 3),
-    IPV4HINT((short) 4),
-    ECH((short) 5),
-    IPV6HINT((short) 6),
+    MANDATORY(0),
+    ALPN(1),
+    NO_DEFAULT_ALPN(2),
+    PORT(3),
+    IPV4HINT(4),
+    ECH(5),
+    IPV6HINT(6),
     UNKNOWN(null);
 
-    private final Short value;
-    ParameterSVCB(final Short value) {
+    private final int value;
+    ParameterSVCB(final Integer value) {
         this.value = value;
     }
 
-    private static final Map<Short, ParameterSVCB> LOOKUP = new HashMap<>();
+    private static final Map<Integer, ParameterSVCB> LOOKUP = new HashMap<>();
 
     static {
         for (ParameterSVCB t : ParameterSVCB.values()) {
@@ -31,7 +31,7 @@ public enum ParameterSVCB {
         }
     }
 
-    public static ParameterSVCB fromValue(final short value) {
+    public static ParameterSVCB fromValue(final int value) {
         return LOOKUP.get(value);
     }
 }

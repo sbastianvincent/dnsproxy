@@ -41,9 +41,9 @@ import java.util.TreeMap;
 @Getter
 @ToString(callSuper = true)
 public class HTTPSRecord extends Record {
-    private final short svcPriority;
+    private final int svcPriority;
     private final Name targetName;
-    private final Map<Short, ParameterSvcBinding> svcParams;
+    private final Map<Integer, ParameterSvcBinding> svcParams;
 
     // Each parameter: 2 bytes key + 2 bytes length + 'length' bytes value
     private static final int PARAM_HEADER_SIZE = 4;
@@ -57,7 +57,7 @@ public class HTTPSRecord extends Record {
         targetName = new Name(message);
         ParameterFactory parameterFactory = new ParameterFactoryImpl();
         while (message.remaining() >= PARAM_HEADER_SIZE) {
-            short key = message.readU16();
+            int key = message.readU16();
             int len = message.readU16();
             byte[] value = message.readByteArray(len);
             ParameterSvcBinding param = parameterFactory.getParameterSvcBinding(key);
@@ -78,7 +78,7 @@ public class HTTPSRecord extends Record {
         svcPriority = httpsRecord.getSvcPriority();
         targetName = httpsRecord.getTargetName().clone();
         svcParams = new TreeMap<>();
-        for (Map.Entry<Short, ParameterSvcBinding> entry : httpsRecord.getSvcParams().entrySet()) {
+        for (Map.Entry<Integer, ParameterSvcBinding> entry : httpsRecord.getSvcParams().entrySet()) {
             this.svcParams.put(entry.getKey(), entry.getValue().clone());
         }
     }
@@ -86,7 +86,7 @@ public class HTTPSRecord extends Record {
     private boolean checkMandatoryParams() {
         ParameterMandatory param = (ParameterMandatory) svcParams.get(ParameterSVCB.MANDATORY.getValue());
         if (param != null) {
-            for (short key : param.getValues()) {
+            for (int key : param.getValues()) {
                 if (svcParams.get(key) == null) {
                     return false;
                 }
@@ -99,11 +99,11 @@ public class HTTPSRecord extends Record {
     protected void rrToByteResponse(final MessageOutput messageOutput) {
         messageOutput.writeU16(svcPriority);
         targetName.toByteResponse(messageOutput);
-        for (Map.Entry<Short, ParameterSvcBinding> entry : svcParams.entrySet()) {
+        for (Map.Entry<Integer, ParameterSvcBinding> entry : svcParams.entrySet()) {
             messageOutput.writeU16(entry.getKey());
             ParameterSvcBinding param = entry.getValue();
             byte[] value = param.toByteArr();
-            messageOutput.writeU16((short) value.length);
+            messageOutput.writeU16(value.length);
             messageOutput.writeByteArray(value);
         }
     }

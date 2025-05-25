@@ -62,7 +62,7 @@ public abstract class Record implements Cloneable {
         messageOutput.writeU16(dnsClass.getValue());
         messageOutput.writeU32(ttl);
         int lengthPosition = messageOutput.getPos();
-        messageOutput.writeU16((short) 0);
+        messageOutput.writeU16(0);
         rrToByteResponse(messageOutput);
         int rrLength = messageOutput.getPos() - lengthPosition - 2;
         messageOutput.writeU16At(rrLength, lengthPosition);

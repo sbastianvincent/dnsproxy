@@ -37,7 +37,7 @@ public class MessageOutput {
         data[pos++] = (byte) (val & UNSIGNED_BYTE_MASK);
     }
 
-    public void writeU16(final short val) {
+    public void writeU16(final int val) {
         ensureCapacity(SHORT_BYTE_SIZE);
         data[pos++] = (byte) ((val >>> SHIFT_8) & UNSIGNED_BYTE_MASK);
         data[pos++] = (byte) (val & UNSIGNED_BYTE_MASK);

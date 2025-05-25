@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 public class ParameterPort implements ParameterSvcBinding {
-    private short port;
+    private int port;
 
     public ParameterPort() {
         super();

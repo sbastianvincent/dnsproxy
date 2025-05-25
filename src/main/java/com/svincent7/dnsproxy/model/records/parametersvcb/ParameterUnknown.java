@@ -7,7 +7,7 @@ public class ParameterUnknown implements ParameterSvcBinding {
     private final int key;
     private byte[] value;
 
-    public ParameterUnknown(final short key) {
+    public ParameterUnknown(final int key) {
         super();
         this.key = key;
     }

@@ -16,14 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @ToString
 @Slf4j
+@Getter
 public class Message {
     private final Header header;
     private final Map<Integer, List<Record>> sections;
     @Setter
-    @Getter
     private boolean isReturnedFromCache = false;
     @Setter
-    @Getter
     private boolean isDNSRewritten = false;
 
     public static final int TOTAL_SECTION = 4;
@@ -75,7 +74,7 @@ public class Message {
                 }
             }
         }
-        header.getCounts()[Header.SECTION_ADDITIONAL_RR] = (short) additional;
+        header.getCounts()[Header.SECTION_ADDITIONAL_RR] = additional;
         messageOutput.writeU16At(header.getCounts()[Header.SECTION_ADDITIONAL_RR], Header.ADDITIONAL_POSITION);
     }
 

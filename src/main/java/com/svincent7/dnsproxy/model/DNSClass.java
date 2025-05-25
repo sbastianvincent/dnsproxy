@@ -9,20 +9,20 @@ import java.util.Map;
 @Getter
 @ToString
 public enum DNSClass {
-    IN((short) 1),
-    CH((short) 3),
-    CHAOS((short) 3),
-    HS((short) 4),
-    HESIOD((short) 4),
-    NONE((short) 254),
-    ANY((short) 255);
+    IN(1),
+    CH(3),
+    CHAOS(3),
+    HS(4),
+    HESIOD(4),
+    NONE(254),
+    ANY(255);
 
-    private final short value;
-    DNSClass(final short value) {
+    private final int value;
+    DNSClass(final int value) {
         this.value = value;
     }
 
-    private static final Map<Short, DNSClass> LOOKUP = new HashMap<>();
+    private static final Map<Integer, DNSClass> LOOKUP = new HashMap<>();
 
     static {
         for (DNSClass t : DNSClass.values()) {
@@ -30,7 +30,7 @@ public enum DNSClass {
         }
     }
 
-    public static DNSClass fromValue(final short value) {
+    public static DNSClass fromValue(final int value) {
         DNSClass result = LOOKUP.get(value);
         if (result == null) {
             throw new IllegalArgumentException("Unknown DClass: " + value);

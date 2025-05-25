@@ -9,6 +9,7 @@ public class MessageInput {
     private final ByteBuffer byteBuffer;
 
     private static final int UNSIGNED_BYTE_MASK = 0xFF;
+    private static final int UNSIGNED_SHORT_MASK = 0xFFFF;
     private static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
 
     public MessageInput(final byte[] data) {
@@ -23,8 +24,8 @@ public class MessageInput {
         return byteBuffer.get() & UNSIGNED_BYTE_MASK;
     }
 
-    public short readU16() {
-        return byteBuffer.getShort();
+    public int readU16() {
+        return byteBuffer.getShort() & UNSIGNED_SHORT_MASK;
     }
 
     public long readU32() {

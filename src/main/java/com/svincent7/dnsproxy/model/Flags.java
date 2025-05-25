@@ -9,19 +9,19 @@ import java.util.Map;
 @Getter
 @ToString
 public enum Flags {
-    QR((short) 0),
-    AA((short) 5),
-    TC((short) 6),
-    RD((short) 7),
-    AD((short) 10),
-    CD((short) 11);
+    QR(0),
+    AA(5),
+    TC(6),
+    RD(7),
+    AD(10),
+    CD(11);
 
-    private final short value;
-    Flags(final short value) {
+    private final int value;
+    Flags(final int value) {
         this.value = value;
     }
 
-    private static final Map<Short, Flags> LOOKUP = new HashMap<>();
+    private static final Map<Integer, Flags> LOOKUP = new HashMap<>();
 
     static {
         for (Flags t : Flags.values()) {
@@ -29,7 +29,7 @@ public enum Flags {
         }
     }
 
-    public static Flags fromValue(final short value) {
+    public static Flags fromValue(final int value) {
         Flags result = LOOKUP.get(value);
         if (result == null) {
             throw new IllegalArgumentException("Unknown Flags: " + value);

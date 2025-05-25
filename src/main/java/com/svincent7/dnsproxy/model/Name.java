@@ -39,7 +39,7 @@ public class Name implements Cloneable {
             }
 
             byte[] labelBytes = label.getBytes(StandardCharsets.UTF_8);
-            messageOutput.writeU8((short) labelBytes.length);
+            messageOutput.writeU8(labelBytes.length);
             messageOutput.writeByteArray(labelBytes, 0, labelBytes.length);
         }
         messageOutput.writeU8(0); // end of name

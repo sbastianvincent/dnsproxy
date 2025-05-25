@@ -1,5 +1,5 @@
 package com.svincent7.dnsproxy.model.records.parametersvcb;
 
 public interface ParameterFactory {
-    ParameterSvcBinding getParameterSvcBinding(short key);
+    ParameterSvcBinding getParameterSvcBinding(int key);
 }

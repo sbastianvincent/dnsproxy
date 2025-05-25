@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 public class ParameterMandatory implements ParameterSvcBinding {
-    private final List<Short> values;
+    private final List<Integer> values;
 
     public ParameterMandatory() {
         super();
@@ -26,7 +26,7 @@ public class ParameterMandatory implements ParameterSvcBinding {
     @Override
     public byte[] toByteArr() {
         MessageOutput message = new MessageOutput();
-        for (Short value : values) {
+        for (Integer value : values) {
             message.writeU16(value);
         }
         return message.toByteArray();
@@ -36,7 +36,7 @@ public class ParameterMandatory implements ParameterSvcBinding {
     public void fromByteArray(final byte[] bytes) throws DNSMessageParseException {
         MessageInput message = new MessageInput(bytes);
         while (message.remaining() >= 2) {
-            short key = message.readU16();
+            int key = message.readU16();
             values.add(key);
         }
         if (message.remaining() > 0) {

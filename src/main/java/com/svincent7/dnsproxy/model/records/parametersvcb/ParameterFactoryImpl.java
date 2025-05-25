@@ -2,7 +2,7 @@ package com.svincent7.dnsproxy.model.records.parametersvcb;
 
 public class ParameterFactoryImpl implements ParameterFactory {
     @Override
-    public ParameterSvcBinding getParameterSvcBinding(final short key) {
+    public ParameterSvcBinding getParameterSvcBinding(final int key) {
         return switch (ParameterSVCB.fromValue(key)) {
             case MANDATORY -> new ParameterMandatory();
             case ALPN -> new ParameterAlpn();

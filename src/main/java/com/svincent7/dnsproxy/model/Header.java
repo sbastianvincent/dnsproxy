@@ -16,9 +16,9 @@ import lombok.ToString;
 @Getter
 @ToString
 public class Header {
-    private final short transactionId;
-    private short flags;
-    private final short[] counts;
+    private final int transactionId;
+    private int flags;
+    private final int[] counts;
 
     public static final int SECTION_QUESTION = 0;
     public static final int SECTION_ANSWER = SECTION_QUESTION + 1;
@@ -28,34 +28,27 @@ public class Header {
     public static final int FLAGS_POSITION = 2;
     public static final int ADDITIONAL_POSITION = 10;
 
-    private static final int UNSIGNED_SHORT_MASK = 0xFFFF;
-    private static final int OPCODE_MASK = 0xF;
-    private static final int OPCODE_SHIFT = 11;
     private static final int RCODE_MASK = 0x000F;
     private static final int FLAGS_BIT_LENGTH = 15;
 
     public Header(final MessageInput messageInput) {
         this.transactionId = messageInput.readU16();
         this.flags = messageInput.readU16();
-        this.counts = new short[Message.TOTAL_SECTION];
-        for (short i = 0; i < counts.length; i++) {
+        this.counts = new int[Message.TOTAL_SECTION];
+        for (int i = 0; i < counts.length; i++) {
             this.counts[i] = messageInput.readU16();
         }
     }
 
-    public Header(final short transactionId, final short flags, final short[] counts) {
+    public Header(final int transactionId, final int flags, final int[] counts) {
         this.transactionId = transactionId;
         this.flags = flags;
         this.counts = counts;
     }
 
-    public OpCode getOpCode() {
-        return OpCode.fromValue((((flags & UNSIGNED_SHORT_MASK) >> OPCODE_SHIFT) & OPCODE_MASK));
-    }
-
     public void setRCode(final RCode rcode) {
         flags &= ~RCODE_MASK;
-        flags |= (short) (rcode.getValue() & RCODE_MASK);
+        flags |= (rcode.getValue() & RCODE_MASK);
     }
 
     public RCode getRCode() {
@@ -63,7 +56,7 @@ public class Header {
     }
 
     public void setFlag(final Flags flag) {
-        flags |= (short) (1 << (FLAGS_BIT_LENGTH - flag.getValue()));
+        flags |= (1 << (FLAGS_BIT_LENGTH - flag.getValue()));
     }
 
     public boolean isFlagSet(final Flags flag) {
@@ -81,7 +74,7 @@ public class Header {
     public void toByteResponse(final MessageOutput messageOutput) {
         messageOutput.writeU16(transactionId);
         messageOutput.writeU16(flags);
-        for (short count: counts) {
+        for (int count: counts) {
             messageOutput.writeU16(count);
         }
     }
