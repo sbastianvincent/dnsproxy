@@ -1,4 +1,4 @@
-name: CI
+name: build
 
 on:
   push:
@@ -29,3 +29,8 @@ jobs:
         with:
           name: jacoco-report
           path: target/site/jacoco
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}
