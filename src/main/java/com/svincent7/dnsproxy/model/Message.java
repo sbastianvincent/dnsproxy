@@ -70,7 +70,6 @@ public class Message {
                     } else {
                         additional--;
                     }
-                    break;
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.svincent7.dnsproxy.model;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -46,7 +47,7 @@ public class Name implements Cloneable {
     }
 
     public int getLength() {
-        if (name == null || name.isEmpty()) {
+        if (StringUtils.isEmpty(name)) {
             return 1; // root label (just the terminating 0)
         }
 
@@ -77,7 +78,6 @@ public class Name implements Cloneable {
         }
 
         int pos = startPos;
-        boolean jumped = false;
         int totalLength = 0;
 
         while (true) {
@@ -85,9 +85,7 @@ public class Name implements Cloneable {
 
             // pointer detection: top two bits 11
             if ((len & POINTER_FLAG) == POINTER_FLAG) {
-                if (!jumped) {
-                    totalLength += 2; // pointer is 2 bytes
-                }
+                totalLength += 2; // pointer is 2 bytes
                 int b2 = messageInput.getByteAt(pos + 1) & UNSIGNED_BYTE_MASK;
                 int pointer = ((len & POINTER_MASK) << POINTER_SHIFT) | b2;
 
@@ -101,15 +99,11 @@ public class Name implements Cloneable {
             }
 
             if (len == 0) {
-                if (!jumped) {
-                    totalLength++;
-                }
+                totalLength++;
                 break;
             }
 
-            if (!jumped) {
-                totalLength += (len + 1);
-            }
+            totalLength += (len + 1);
 
             pos++;
             for (int i = 0; i < len; i++) {

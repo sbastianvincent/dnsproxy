@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class DnsProxyApplicationTests {
 
 	@Test
-	void contextLoads() {
+	public void contextLoads() {
+		DnsProxyApplication.main(new String[]{});
 	}
-
 }

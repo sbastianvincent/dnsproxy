@@ -52,13 +52,6 @@ public class ARecord extends Record {
         ipAddress = getIpAddress(toArray(addr));
     }
 
-    public ARecord(final Name name, final Type type, final DNSClass dnsClass, final long ttl, final int length,
-                   final String ipAddress) {
-        super(name, type, dnsClass, ttl, length);
-        this.ipAddress = ipAddress;
-        this.addr = ipToInt(ipAddress);
-    }
-
     public ARecord(final ARecord record) {
         super(record.getName().clone(), record.getType(), record.getDnsClass(), record.getTtl(), record.getLength());
         this.addr = record.getAddr();

@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: dnsproxy
+
+dnsproxy:
+  port: 0
+  thread-pool-size: 5
+  upstream-servers:
+    - 1.1.1.1
+    - 8.8.8.8
+  cache-strategy: in-memory
+  allowlisted-cache-type:
+    - A
+    - AAAA
+    - CNAME
+  dns-rewrites-provider: config
+  dns-rewrites:
+    dns.test.example:
+      - 192.168.10.20
+      - 192.168.10.120
+  allowlisted-dns-rewrites-types:
+    - A
+    - AAAA
+    - CNAME
+  default-dns-rewrites-timeout: 60
+  blocklisted-domains:
+    - blocked.com
+    - "*.blocked.com"
+  allowlisted-domains:
+    - "*"
