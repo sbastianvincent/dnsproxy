@@ -1,8 +1,9 @@
 # DNS Proxy
 
 [![BSD 3-Clause License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![codecov](https://codecov.io/gh/sbastianvincent/dnsproxy/branch/master/graph/badge.svg)](https://codecov.io/gh/sbastianvincent/dnsproxy)
+![Build Status](https://github.com/sbastianvincent/dnsproxy/actions/workflows/build.yml/badge.svg)
 ![Checkstyle](https://github.com/sbastianvincent/dnsproxy/actions/workflows/checkstyle.yml/badge.svg)
+[![codecov](https://codecov.io/gh/sbastianvincent/dnsproxy/branch/master/graph/badge.svg)](https://codecov.io/gh/sbastianvincent/dnsproxy)
 
 A lightweight, customizable DNS proxy server written in Java (Spring Boot). It intercepts DNS queries, processes or filters them based on customizable rules, and forwards them to upstream DNS servers as needed.
 
