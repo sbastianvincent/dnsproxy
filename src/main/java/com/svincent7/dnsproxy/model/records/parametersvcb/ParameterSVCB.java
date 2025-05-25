@@ -18,7 +18,7 @@ public enum ParameterSVCB {
     IPV6HINT(6),
     UNKNOWN(null);
 
-    private final int value;
+    private final Integer value;
     ParameterSVCB(final Integer value) {
         this.value = value;
     }
@@ -27,11 +27,13 @@ public enum ParameterSVCB {
 
     static {
         for (ParameterSVCB t : ParameterSVCB.values()) {
-            LOOKUP.put(t.getValue(), t);
+            if (t.getValue() != null) {
+                LOOKUP.put(t.getValue(), t);
+            }
         }
     }
 
     public static ParameterSVCB fromValue(final int value) {
-        return LOOKUP.get(value);
+        return LOOKUP.getOrDefault(value, UNKNOWN);
     }
 }

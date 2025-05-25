@@ -43,7 +43,7 @@ public class AAAARecord extends Record {
                       final MessageInput message) {
         super(name, type, dnsClass, ttl, length);
         this.address = message.readByteArray(IPV6_ADDRESS_LENGTH);
-        this.ipAddress = getIpAddress();
+        this.ipAddress = getIp();
     }
 
     public AAAARecord(final String domainName, final long ttl, final String ipAddress) {
@@ -56,10 +56,10 @@ public class AAAARecord extends Record {
         super(aaaaRecord.getName().clone(), aaaaRecord.getType(), aaaaRecord.getDnsClass(), aaaaRecord.getTtl(),
                 aaaaRecord.getLength());
         this.address = aaaaRecord.getAddress().clone();
-        this.ipAddress = aaaaRecord.getIpAddress();
+        this.ipAddress = aaaaRecord.getIp();
     }
 
-    private String getIpAddress() {
+    private String getIp() {
         InetAddress inetAddress = null;
         try {
             inetAddress = InetAddress.getByAddress(null, address);

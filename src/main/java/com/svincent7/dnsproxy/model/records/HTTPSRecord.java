@@ -8,9 +8,9 @@ import com.svincent7.dnsproxy.model.Name;
 import com.svincent7.dnsproxy.model.Type;
 import com.svincent7.dnsproxy.model.records.parametersvcb.ParameterFactory;
 import com.svincent7.dnsproxy.model.records.parametersvcb.ParameterFactoryImpl;
-import com.svincent7.dnsproxy.model.records.parametersvcb.ParameterSvcBinding;
 import com.svincent7.dnsproxy.model.records.parametersvcb.ParameterMandatory;
 import com.svincent7.dnsproxy.model.records.parametersvcb.ParameterSVCB;
+import com.svincent7.dnsproxy.model.records.parametersvcb.ParameterSvcBinding;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -85,11 +85,9 @@ public class HTTPSRecord extends Record {
 
     private boolean checkMandatoryParams() {
         ParameterMandatory param = (ParameterMandatory) svcParams.get(ParameterSVCB.MANDATORY.getValue());
-        if (param != null) {
-            for (int key : param.getValues()) {
-                if (svcParams.get(key) == null) {
-                    return false;
-                }
+        for (int key : param.getValues()) {
+            if (svcParams.get(key) == null) {
+                return false;
             }
         }
         return true;

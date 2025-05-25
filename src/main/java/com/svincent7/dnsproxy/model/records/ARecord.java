@@ -90,7 +90,7 @@ public class ARecord extends Record {
         return new ARecord(this);
     }
 
-    private int ipToInt(final String ip) {
+    public static int ipToInt(final String ip) {
         String[] parts = ip.split("\\.");
         if (parts.length != IPV4_LENGTH) {
             throw new IllegalArgumentException("Invalid IPv4 address: " + ip);

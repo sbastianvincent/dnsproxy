@@ -76,11 +76,5 @@ public abstract class Record implements Cloneable {
     protected abstract void rrToByteResponse(MessageOutput messageOutput);
 
     @Override
-    public Record clone() {
-        try {
-            return (Record) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("Cloning failed", e);
-        }
-    }
+    public abstract Record clone();
 }
