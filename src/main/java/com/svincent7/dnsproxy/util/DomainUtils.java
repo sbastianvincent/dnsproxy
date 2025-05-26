@@ -1,12 +1,14 @@
 package com.svincent7.dnsproxy.util;
 
+import java.util.regex.Pattern;
+
 public final class DomainUtils {
-    private static final int MAX_DOMAIN_NAME_LENGTH = 253;
-    private static final int MAX_DOMAIN_LABEL_LENGTH = 63;
-    private static final String DOMAIN_NAME_REGEX = "^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$";
+    private static final Pattern DOMAIN_NAME_REGEX = Pattern.compile(
+            "^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*\\."
+                    + "(com|net|org|edu|gov|io|[a-z]{2,})\\.?$");
 
     private DomainUtils() {
-        throw new IllegalArgumentException("Utility class");
+
     }
 
     /**
@@ -27,28 +29,7 @@ public final class DomainUtils {
             return true;
         }
 
-        String d = domain.endsWith(".") ? domain.substring(0, domain.length() - 1) : domain;
-
-        boolean hasWildcard = d.startsWith("*.");
-        if (hasWildcard) {
-            d = d.substring(2); // remove "*."
-        }
-
-        if (d.length() > MAX_DOMAIN_NAME_LENGTH) {
-            return false;
-        }
-
-        String[] labels = d.split("\\.");
-        for (String label : labels) {
-            if (label.isEmpty() || label.length() > MAX_DOMAIN_LABEL_LENGTH) {
-                return false;
-            }
-            if (!label.matches(DOMAIN_NAME_REGEX)) {
-                return false;
-            }
-        }
-
-        return true;
+        return DOMAIN_NAME_REGEX.matcher(domain).matches();
     }
 
     public static boolean isWildcard(final String domain) {

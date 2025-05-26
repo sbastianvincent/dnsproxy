@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 public final class CryptoUtils {
 
     private CryptoUtils() {
-        throw new IllegalArgumentException("Utility class");
+
     }
 
     public static String sha256(final String str) {

@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public final class AddressUtils {
     private AddressUtils() {
-        throw new IllegalArgumentException("Utility class");
+
     }
 
     private static final Pattern IPV4_PATTERN = Pattern.compile(
@@ -14,10 +14,16 @@ public final class AddressUtils {
     );
 
     private static final Pattern IPV6_PATTERN = Pattern.compile(
-            "^(?:[\\da-fA-F]{1,4}:){7}[\\da-fA-F]{1,4}$|"          // full form
-                    + "^((?:[\\da-fA-F]{1,4}:){1,7}:)$|"           // ending with ::
-                    + "^(:((?::[\\da-fA-F]{1,4}){1,7}))$|"         // starting with ::
-                    + "^(::)$"                                     // just ::
+            "^(?:[\\da-fA-F]{1,4}:){7}[\\da-fA-F]{1,4}$"
+                    + "|^(?:[\\da-fA-F]{1,4}:){1,7}:$"
+                    + "|^(?:[\\da-fA-F]{1,4}:){1,6}:[\\da-fA-F]{1,4}$"
+                    + "|^(?:[\\da-fA-F]{1,4}:){1,5}(?::[\\da-fA-F]{1,4}){1,2}$"
+                    + "|^(?:[\\da-fA-F]{1,4}:){1,4}(?::[\\da-fA-F]{1,4}){1,3}$"
+                    + "|^(?:[\\da-fA-F]{1,4}:){1,3}(?::[\\da-fA-F]{1,4}){1,4}$"
+                    + "|^(?:[\\da-fA-F]{1,4}:){1,2}(?::[\\da-fA-F]{1,4}){1,5}$"
+                    + "|^[\\da-fA-F]{1,4}:(?::[\\da-fA-F]{1,4}){1,6}$"
+                    + "|^:(?::[\\da-fA-F]{1,4}){1,7}$"
+                    + "|^(::)$"
     );
 
     public static Type detectType(final String input) {

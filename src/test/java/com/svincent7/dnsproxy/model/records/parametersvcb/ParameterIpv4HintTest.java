@@ -29,4 +29,16 @@ public class ParameterIpv4HintTest {
         Assertions.assertEquals(hint.getAddresses().size(), ((ParameterIpv4Hint) clone).getAddresses().size());
         Assertions.assertArrayEquals(ipv4HintParam, clone.toByteArr());
     }
+
+    @Test
+    void testFromByteArray_AnythingLeft() {
+        byte[] ipv4HintParam = new byte[] {
+                (byte) 0xC0, (byte) 0xA8, 0x01, 0x01, // 192.168.1.1
+                (byte) 0xC0, (byte) 0xA8, 0x01, 0x02,  // 192.168.1.2
+                0x01
+        };
+
+        ParameterIpv4Hint hint = new ParameterIpv4Hint();
+        Assertions.assertThrows(DNSMessageParseException.class, () -> hint.fromByteArray(ipv4HintParam));
+    }
 }

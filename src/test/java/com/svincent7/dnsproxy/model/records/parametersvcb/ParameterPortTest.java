@@ -25,4 +25,12 @@ public class ParameterPortTest {
         Assertions.assertArrayEquals(port.toByteArr(), clone.toByteArr());
         Assertions.assertArrayEquals(data, port.toByteArr());
     }
+
+    @Test
+    void testFromByteArray_AnythingLeft() {
+        byte[] data = new byte[]{0x01, 0x02, 0x03};
+
+        ParameterPort port = new ParameterPort();
+        Assertions.assertThrows(DNSMessageParseException.class, () -> port.fromByteArray(data));
+    }
 }

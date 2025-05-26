@@ -38,4 +38,25 @@ public class ParameterIpv6HintTest {
         Assertions.assertEquals(hint.getAddresses().size(), ((ParameterIpv6Hint) clone).getAddresses().size());
         Assertions.assertArrayEquals(ipv6HintParam, clone.toByteArr());
     }
+
+    @Test
+    void testFromByteArray_AnythingLeft() {
+        byte[] ipv6HintParam = new byte[] {
+                // 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+                (byte)0x20, (byte)0x01, (byte)0x0d, (byte)0xb8,
+                (byte)0x85, (byte)0xa3, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x8a, (byte)0x2e,
+                (byte)0x03, (byte)0x70, (byte)0x73, (byte)0x34,
+
+                // 2001:0db8:85a3:0000:0000:8a2e:0370:7335
+                (byte)0x20, (byte)0x01, (byte)0x0d, (byte)0xb8,
+                (byte)0x85, (byte)0xa3, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x8a, (byte)0x2e,
+                (byte)0x03, (byte)0x70, (byte)0x73, (byte)0x35,
+                0x01
+        };
+
+        ParameterIpv6Hint hint = new ParameterIpv6Hint();
+        Assertions.assertThrows(DNSMessageParseException.class, () -> hint.fromByteArray(ipv6HintParam));
+    }
 }
