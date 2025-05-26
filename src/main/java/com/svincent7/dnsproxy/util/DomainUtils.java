@@ -3,9 +3,9 @@ package com.svincent7.dnsproxy.util;
 import java.util.regex.Pattern;
 
 public final class DomainUtils {
-    private static final Pattern DOMAIN_NAME_REGEX = Pattern.compile(
-            "^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*\\."
-                    + "(com|net|org|edu|gov|io|[a-z]{2,})\\.?$");
+    private static final int MAX_DOMAIN_NAME_LENGTH = 253;
+    private static final int MAX_DOMAIN_LABEL_LENGTH = 63;
+    private static final Pattern LABEL_REGEX = Pattern.compile("^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$");
 
     private DomainUtils() {
 
@@ -29,7 +29,35 @@ public final class DomainUtils {
             return true;
         }
 
-        return DOMAIN_NAME_REGEX.matcher(domain).matches();
+        String d = domain.endsWith(".") ? domain.substring(0, domain.length() - 1) : domain;
+
+        boolean hasWildcard = d.startsWith("*.");
+        if (hasWildcard) {
+            d = d.substring(2); // remove "*."
+        }
+
+        if (d.length() > MAX_DOMAIN_NAME_LENGTH) {
+            return false;
+        }
+
+        String[] labels = d.split("\\.");
+
+        String tld = labels[labels.length - 1];
+        if (tld.matches("\\d+")) {
+            return false; // TLD is all digits, reject it
+        }
+
+        for (String label : labels) {
+            if (label.isEmpty() || label.length() > MAX_DOMAIN_LABEL_LENGTH) {
+                return false;
+            }
+
+            if (!LABEL_REGEX.matcher(label).matches()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static boolean isWildcard(final String domain) {

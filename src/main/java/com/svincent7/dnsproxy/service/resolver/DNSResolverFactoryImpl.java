@@ -19,12 +19,12 @@ public class DNSResolverFactoryImpl implements DNSResolverFactory {
     public UDPResolver createUDPResolver() {
         Random random = new Random();
         List<String> upstreamServers = dnsProxyConfig.getUpstreamServers();
-        String upstreamServer = upstreamServers.get(random.nextInt(upstreamServers.size()));
 
-        if (upstreamServer == null) {
+        if (upstreamServers.isEmpty()) {
             throw new IllegalArgumentException("No upstream server found");
         }
 
+        String upstreamServer = upstreamServers.get(random.nextInt(upstreamServers.size()));
         return new UDPResolver(upstreamServer, DNS_DEFAULT_PORT);
     }
 
@@ -32,12 +32,12 @@ public class DNSResolverFactoryImpl implements DNSResolverFactory {
     public TCPResolver createTCPResolver() {
         Random random = new Random();
         List<String> upstreamServers = dnsProxyConfig.getUpstreamServers();
-        String upstreamServer = upstreamServers.get(random.nextInt(upstreamServers.size()));
 
-        if (upstreamServer == null) {
+        if (upstreamServers.isEmpty()) {
             throw new IllegalArgumentException("No upstream server found");
         }
 
+        String upstreamServer = upstreamServers.get(random.nextInt(upstreamServers.size()));
         return new TCPResolver(upstreamServer, DNS_DEFAULT_PORT);
     }
 }

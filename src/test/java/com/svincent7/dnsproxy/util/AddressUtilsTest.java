@@ -15,8 +15,8 @@ public class AddressUtilsTest {
 
     @Test
     public void testDetectType_withInvalidIPv4() {
-        Assertions.assertNull(AddressUtils.detectType("256.100.100.100"));
-        Assertions.assertNull(AddressUtils.detectType("192.168.1"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> AddressUtils.detectType("256.100.100.100"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> AddressUtils.detectType("192.168.1"));
     }
 
     @Test
@@ -28,8 +28,8 @@ public class AddressUtilsTest {
 
     @Test
     public void testDetectType_withInvalidIPv6() {
-        Assertions.assertNull(AddressUtils.detectType("2001:::7334"));
-        Assertions.assertNull(AddressUtils.detectType("12345::abcd"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> AddressUtils.detectType("2001:::7334"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> AddressUtils.detectType("12345::abcd"));
     }
 
     @Test
@@ -40,8 +40,8 @@ public class AddressUtilsTest {
 
     @Test
     public void testDetectType_withInvalidInput() {
-        Assertions.assertNull(AddressUtils.detectType(""));
-        Assertions.assertNull(AddressUtils.detectType(null));
-        Assertions.assertNull(AddressUtils.detectType("invalid_domain@.com"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> AddressUtils.detectType(""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> AddressUtils.detectType(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> AddressUtils.detectType("invalid_domain@.com"));
     }
 }

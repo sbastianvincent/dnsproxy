@@ -28,7 +28,7 @@ public final class AddressUtils {
 
     public static Type detectType(final String input) {
         if (input == null || input.isEmpty()) {
-            return null;
+            throw new IllegalArgumentException("input is empty");
         }
         if (IPV4_PATTERN.matcher(input).matches()) {
             return Type.A;
@@ -39,6 +39,6 @@ public final class AddressUtils {
         if (DomainUtils.isValidDomainName(input)) {
             return Type.CNAME;
         }
-        return null;
+        throw new IllegalArgumentException("input is undefined");
     }
 }

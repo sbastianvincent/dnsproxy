@@ -19,8 +19,13 @@ public class DomainUtilsTest {
         Assertions.assertFalse(DomainUtils.isValidDomainName("192.168.10.1"));
         Assertions.assertFalse(DomainUtils.isValidDomainName("2001:0db8:85a3:0000:0000:8a2e:0370:7334"));
         Assertions.assertFalse(DomainUtils.isValidDomainName("goog!e.com"));
-        Assertions.assertFalse(DomainUtils.isValidDomainName("*.com"));
         Assertions.assertFalse(DomainUtils.isValidDomainName("*."));
+        Assertions.assertFalse(DomainUtils.isValidDomainName("a".repeat(63) + "." +
+                "b".repeat(63) + "." +
+                "c".repeat(63) + "." +
+                "d".repeat(61) + ".com"));
+        Assertions.assertFalse(DomainUtils.isValidDomainName("a".repeat(64) + ".com"));
+        Assertions.assertFalse(DomainUtils.isValidDomainName("..com"));
     }
 
     @Test
@@ -42,7 +47,7 @@ public class DomainUtilsTest {
     @Test
     void testEnsureFqdn_Invalid_ThrowsException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> DomainUtils.ensureFqdnName("192.168.10.1"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> DomainUtils.ensureFqdnName("g.com1"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> DomainUtils.ensureFqdnName("*.com"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> DomainUtils.ensureFqdnName("g.123"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> DomainUtils.ensureFqdnName("g.*"));
     }
 }

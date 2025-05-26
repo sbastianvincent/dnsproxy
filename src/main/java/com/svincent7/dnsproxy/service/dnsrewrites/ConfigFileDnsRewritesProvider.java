@@ -40,9 +40,8 @@ public class ConfigFileDnsRewritesProvider extends AbstractDNSRewritesProvider {
                             new ARecord(domain, getConfig().getDefaultDnsRewritesTimeout(), rewrite));
                     case AAAA -> addRecordDNSRewrites(domain,
                             new AAAARecord(domain, getConfig().getDefaultDnsRewritesTimeout(), rewrite));
-                    case CNAME -> addRecordDNSRewrites(domain,
+                    default -> addRecordDNSRewrites(domain,
                             new CNAMERecord(domain, getConfig().getDefaultDnsRewritesTimeout(), new Name(rewrite)));
-                    default -> throw new IllegalStateException("Unexpected value: " + type);
                 }
             }
         }
