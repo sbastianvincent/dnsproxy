@@ -1,18 +1,18 @@
 package com.svincent7.dnsproxy.service;
 
-import com.svincent7.dnsproxy.config.DnsProxyConfig;
 import com.svincent7.dnsproxy.service.alllowlist.AllowlistDictionary;
 import com.svincent7.dnsproxy.service.blocklist.BlocklistDictionary;
 import com.svincent7.dnsproxy.service.cache.CacheFactory;
 import com.svincent7.dnsproxy.service.cache.CacheService;
-import com.svincent7.dnsproxy.service.resolver.DNSResolverFactory;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProvider;
 import com.svincent7.dnsproxy.service.dnsrewrites.DNSRewritesProviderFactory;
 import com.svincent7.dnsproxy.service.packet.PacketHandler;
 import com.svincent7.dnsproxy.service.packet.TCPHandler;
 import com.svincent7.dnsproxy.service.packet.UDPHandler;
+import com.svincent7.dnsproxy.service.resolver.DNSResolverFactory;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -22,46 +22,34 @@ import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DnsProxy implements SmartLifecycle {
 
-    private final BlocklistDictionary blocklistDictionary;
-    private final AllowlistDictionary allowlistDictionary;
+    private final ExecutorService executorService;
     private final DatagramSocket udpSocket;
     private final ServerSocket tcpSocket;
-    private final ExecutorService executor;
-    private final CacheService cacheService;
+    private final BlocklistDictionary blocklistDictionary;
+    private final AllowlistDictionary allowlistDictionary;
+    private final CacheFactory cacheFactory;
     private final DNSResolverFactory dnsResolverFactory;
-    private final DNSRewritesProvider dnsRewritesProvider;
-    private final Thread listenerUDPThread;
-    private final Thread listenerTCPThread;
+    private final DNSRewritesProviderFactory dnsRewritesProviderFactory;
+    private final Thread listenerUDPThread = new Thread(this::listenUdp);
+    private final Thread listenerTCPThread = new Thread(this::listenTcp);
+
+    private CacheService cacheService;
+    private DNSRewritesProvider dnsRewritesProvider;
 
     private volatile boolean running = false;
 
     private static final int BUFFER_SIZE = 1024;
 
-    @Autowired
-    public DnsProxy(final BlocklistDictionary blocklistDictionary,
-                    final AllowlistDictionary allowlistDictionary,
-                    final DnsProxyConfig config,
-                    final CacheFactory cacheFactory,
-                    final DNSResolverFactory dnsResolverFactory,
-                    final DNSRewritesProviderFactory dnsRewritesProviderFactory) throws Exception {
-        this.executor = Executors.newFixedThreadPool(config.getThreadPoolSize());
-        this.udpSocket = new DatagramSocket(config.getPort());
-        this.tcpSocket = new ServerSocket(config.getPort());
-        this.blocklistDictionary = blocklistDictionary;
-        this.allowlistDictionary = allowlistDictionary;
-        this.cacheService = cacheFactory.getCacheService();
-        this.dnsResolverFactory = dnsResolverFactory;
-        this.dnsRewritesProvider = dnsRewritesProviderFactory.getDNSRewritesProvider();
-        this.listenerUDPThread = new Thread(this::listenUdp);
-        this.listenerUDPThread.setName("dns-udp-proxy-listener");
-        this.listenerTCPThread = new Thread(this::listenTcp);
-        this.listenerTCPThread.setName("dns-tcp-proxy-listener");
+    @PostConstruct
+    void setup() {
+        cacheService = cacheFactory.getCacheService();
+        dnsRewritesProvider = dnsRewritesProviderFactory.getDNSRewritesProvider();
     }
 
     @Override
@@ -83,7 +71,7 @@ public class DnsProxy implements SmartLifecycle {
             } catch (IOException e) {
                 log.warn("Error closing TCP socket", e);
             }
-            executor.shutdownNow();
+            executorService.shutdownNow();
             log.info("Shutting down DNS Proxy...");
         }
     }
@@ -96,17 +84,14 @@ public class DnsProxy implements SmartLifecycle {
     private void listenUdp() {
         log.info("Starting DNS UDP Proxy on port {}", udpSocket.getLocalPort());
         byte[] buffer = new byte[BUFFER_SIZE];
-        running = true;
 
         while (running) {
             DatagramPacket request = new DatagramPacket(buffer, buffer.length);
             try {
                 udpSocket.receive(request);
-                executor.submit(() -> handleUdpRequest(request));
+                executorService.submit(() -> handleUdpRequest(request));
             } catch (IOException e) {
-                if (running) {
-                    log.error("Error while Running DNS Proxy", e);
-                }
+                log.error("Error while Running DNS Proxy", e);
             }
         }
 
@@ -120,18 +105,16 @@ public class DnsProxy implements SmartLifecycle {
             try {
                 Socket socket = tcpSocket.accept();
                 log.debug("Accepted TCP connection from {}", socket.getRemoteSocketAddress());
-                executor.submit(() -> handleTcpRequest(socket));
+                executorService.submit(() -> handleTcpRequest(socket));
             } catch (IOException e) {
-                if (running) {
-                    log.error("Error accepting TCP connection", e);
-                }
+                log.error("Error accepting TCP connection", e);
             }
         }
 
         log.info("TCP Proxy listener thread stopped.");
     }
 
-    private void handleUdpRequest(final DatagramPacket request) {
+    void handleUdpRequest(final DatagramPacket request) {
         try {
             PacketHandler handler = new UDPHandler(
                     blocklistDictionary,
@@ -148,7 +131,7 @@ public class DnsProxy implements SmartLifecycle {
         }
     }
 
-    private void handleTcpRequest(final Socket socket) {
+    void handleTcpRequest(final Socket socket) {
         try {
             PacketHandler handler = new TCPHandler(
                     blocklistDictionary,
